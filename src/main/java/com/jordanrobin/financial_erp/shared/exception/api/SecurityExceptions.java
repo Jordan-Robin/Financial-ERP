@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.shared.exception;
+package com.jordanrobin.financial_erp.shared.exception.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
