@@ -32,6 +32,13 @@ public class UserService {
             .orElseThrow(() -> new UserExceptions.UserNotFoundException(email));
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse getById(Long id) {
+        return userRepository.findById(id)
+            .map(userMapper::toResponse)
+            .orElseThrow(() -> new UserExceptions.UserNotFoundException(id.toString()));
+    }
+
     public UserResponse create(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new UserExceptions.EmailAlreadyExistsException(request.email());

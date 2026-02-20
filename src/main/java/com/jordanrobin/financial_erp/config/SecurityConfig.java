@@ -29,7 +29,7 @@ public class SecurityConfig {
             // CSRF désactivé : API REST stateless avec JWT (pas de session cookie)
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
