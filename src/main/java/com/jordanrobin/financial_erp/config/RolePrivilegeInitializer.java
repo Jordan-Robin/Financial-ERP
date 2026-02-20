@@ -52,7 +52,7 @@ public class RolePrivilegeInitializer implements ApplicationRunner {
         ));
     }
 
-    private void upsertRole(RoleName roleName, Set<Privilege> privileges) {
+    void upsertRole(RoleName roleName, Set<Privilege> privileges) {
         Role role = roleRepository.findByName(roleName.name())
             .orElseGet(() -> Role.builder()
                 .name(roleName.name())
@@ -64,7 +64,7 @@ public class RolePrivilegeInitializer implements ApplicationRunner {
         }
     }
 
-    private Set<Privilege> allExcept(Map<PrivilegeName, Privilege> privileges, PrivilegeName... excluded) {
+    Set<Privilege> allExcept(Map<PrivilegeName, Privilege> privileges, PrivilegeName... excluded) {
         Set<PrivilegeName> excludedSet = Set.of(excluded);
         return privileges.entrySet().stream()
             .filter(e -> !excludedSet.contains(e.getKey()))
