@@ -23,12 +23,20 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    private static final String[] SWAGGER_PATHS = {
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/error"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // CSRF désactivé : API REST stateless avec JWT (pas de session cookie)
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(SWAGGER_PATHS).permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .anyRequest().authenticated()
             )
