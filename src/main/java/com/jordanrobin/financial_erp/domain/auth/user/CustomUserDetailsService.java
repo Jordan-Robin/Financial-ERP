@@ -1,8 +1,8 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
@@ -32,15 +32,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<GrantedAuthority> getAuthorities(User user) {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-
-            role.getPrivileges().forEach(privilege -> {
-                authorities.add(new SimpleGrantedAuthority(privilege.getName()));
-            });
-        });
-        return authorities;
+        return user.getRoles().stream()
+            .flatMap(role -> Stream.concat(
+                Stream.of(new SimpleGrantedAuthority("ROLE_" + role.getName())),
+                role.getPrivileges().stream()
+                    .map(p -> new SimpleGrantedAuthority(p.getName().name()))
+            ))
+            .collect(Collectors.toSet());
     }
 }

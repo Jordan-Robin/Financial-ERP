@@ -1,5 +1,6 @@
 package com.jordanrobin.financial_erp.api.user.dtos;
 
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -26,5 +27,5 @@ public record CreateUserRequest(
     String lastName,
 
     @NotEmpty(message = "Au moins un rôle est requis")
-    Set<String> roles
+    Set<RoleName> roles
 ) {}

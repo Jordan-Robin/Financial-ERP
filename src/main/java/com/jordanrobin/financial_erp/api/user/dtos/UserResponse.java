@@ -1,5 +1,6 @@
 package com.jordanrobin.financial_erp.api.user.dtos;
 
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import lombok.Builder;
 
 import java.util.Set;
@@ -10,5 +11,5 @@ public record UserResponse(
     String email,
     String firstName,
     String lastName,
-    Set<String> roles
+    Set<RoleName> roles
 ) {}

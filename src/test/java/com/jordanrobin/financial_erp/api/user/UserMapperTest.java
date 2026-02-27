@@ -4,6 +4,7 @@ import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.api.user.mappers.UserMapper;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -19,7 +20,7 @@ class UserMapperTest {
     @Test
     void shouldMapUserToUserResponse() {
         Role adminRole = new Role();
-        adminRole.setName("ROLE_ADMIN");
+        adminRole.setName(RoleName.TENANT_ADMIN);
 
         User user = User.builder()
             .id(1L)
@@ -32,7 +33,7 @@ class UserMapperTest {
         UserResponse response = mapper.toResponse(user);
 
         assertThat(response.id()).isEqualTo(1L);
-        assertThat(response.roles()).containsExactly("ROLE_ADMIN");
+        assertThat(response.roles()).containsExactly(RoleName.TENANT_ADMIN);
     }
 
     @Test
@@ -40,6 +41,7 @@ class UserMapperTest {
         CreateUserRequest request = CreateUserRequest.builder()
             .email("test@test.com")
             .password("secret123")
+            .roles(Set.of(RoleName.VIEWER))
             .build();
 
         User entity = mapper.toEntity(request);

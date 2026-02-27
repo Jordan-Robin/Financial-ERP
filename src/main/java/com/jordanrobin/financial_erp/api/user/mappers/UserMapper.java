@@ -4,6 +4,7 @@ import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UpdateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
 import org.mapstruct.*;
 
@@ -26,7 +27,7 @@ public interface UserMapper {
     @Mapping(target = "email", ignore = true)
     void updateEntity(UpdateUserRequest request, @MappingTarget User user);
 
-    default Set<String> rolesToStrings(Set<Role> roles) {
+    default Set<RoleName> rolesToRoleNames(Set<Role> roles) {
         if (roles == null) return Set.of();
         return roles.stream()
             .map(Role::getName)

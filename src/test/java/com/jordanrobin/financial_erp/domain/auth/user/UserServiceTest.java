@@ -4,7 +4,9 @@ import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.api.user.mappers.UserMapper;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleRepository;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
 import com.jordanrobin.financial_erp.shared.exception.domain.RoleExceptions;
 import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +40,7 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private RoleRepository roleRepository;
+    private RoleService roleService;
 
     @InjectMocks
     private UserService userService;
@@ -97,22 +100,23 @@ class UserServiceTest {
 
     @Test
     void create_shouldReturnUserResponse_whenSuccess() {
+        RoleName roleName = VIEWER;
         CreateUserRequest request = CreateUserRequest.builder()
             .email("john.doe@email.com")
             .password("secret")
             .firstName("John")
             .lastName("Doe")
-            .roles(Set.of("USER"))
+            .roles(Set.of(roleName))
             .build();
 
-        Role role = Role.builder().name("USER").build();
+        Role role = Role.builder().name(VIEWER).build();
         User user = User.builder().id(1L).email(request.email()).roles(new HashSet<>()).build();
         UserResponse response = UserResponse.builder().id(1L).email(request.email()).build();
 
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
         when(userMapper.toEntity(request)).thenReturn(user);
         when(passwordEncoder.encode(request.password())).thenReturn("encoded_secret");
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(role));
+        when(roleService.findByNameOrThrow(roleName)).thenReturn(role);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(response);
 
@@ -120,6 +124,7 @@ class UserServiceTest {
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.email()).isEqualTo(request.email());
+        verify(roleService).findByNameOrThrow(roleName);
         verify(passwordEncoder).encode("secret");
         verify(userRepository).save(user);
     }
@@ -131,7 +136,7 @@ class UserServiceTest {
             .password("secret")
             .firstName("John")
             .lastName("Doe")
-            .roles(Set.of("USER"))
+            .roles(Set.of(VIEWER))
             .build();
 
         when(userRepository.existsByEmail(request.email())).thenReturn(true);
@@ -148,7 +153,7 @@ class UserServiceTest {
             .password("secret")
             .firstName("John")
             .lastName("Doe")
-            .roles(Set.of("UNKNOWN_ROLE"))
+            .roles(Set.of(CFO))
             .build();
 
         User user = User.builder().id(1L).email(request.email()).roles(new HashSet<>()).build();
@@ -156,10 +161,10 @@ class UserServiceTest {
         when(userRepository.existsByEmail(request.email())).thenReturn(false);
         when(userMapper.toEntity(request)).thenReturn(user);
         when(passwordEncoder.encode(any())).thenReturn("encoded");
-        when(roleRepository.findByName("UNKNOWN_ROLE")).thenReturn(Optional.empty());
+        when(roleService.findByNameOrThrow(CFO)).thenThrow(new RoleExceptions.RoleNotFoundException(CFO.name()));
 
         assertThatThrownBy(() -> userService.create(request))
             .isInstanceOf(RoleExceptions.RoleNotFoundException.class)
-            .hasMessageContaining("UNKNOWN_ROLE");
+            .hasMessageContaining("CFO");
     }
 }

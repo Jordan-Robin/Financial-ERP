@@ -1,7 +1,6 @@
 package com.jordanrobin.financial_erp.domain.auth.privilege;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,9 +25,9 @@ public class Privilege {
     @Column(name = "privilege_id")
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true, length = 50)
+    private PrivilegeName name;
 
     private String description;
 

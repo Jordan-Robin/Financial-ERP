@@ -3,6 +3,7 @@ package com.jordanrobin.financial_erp.api.user;
 import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.config.SecurityConfig;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,10 @@ class UserControllerTest {
             .password("secret123")
             .firstName("John")
             .lastName("Doe")
-            .roles(Set.of("ADMIN"))
+            .roles(Set.of(RoleName.TENANT_ADMIN))
             .build();
 
-        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of("ADMIN"));
+        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of(RoleName.TENANT_ADMIN));
 
         when(userService.create(any(CreateUserRequest.class))).thenReturn(response);
 
@@ -67,7 +68,7 @@ class UserControllerTest {
     @Test
     @WithMockUser // Par défaut ROLE_USER
     void getUser_shouldReturn200() {
-        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of("USER"));
+        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of(RoleName.VIEWER));
         when(userService.getById(1L)).thenReturn(response);
 
         restTestClient.get().uri("/api/users/1")
@@ -85,7 +86,7 @@ class UserControllerTest {
             .password("123")
             .firstName("J")
             .lastName("D")
-            .roles(Set.of("USER"))
+            .roles(Set.of(RoleName.VIEWER))
             .build();
 
         restTestClient.post().uri("/api/users")
