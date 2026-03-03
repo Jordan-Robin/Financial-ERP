@@ -28,7 +28,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken validateAndRotate(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenWithUser(token)
             .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token introuvable"));
 
         if (refreshToken.isRevoked()) {
