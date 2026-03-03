@@ -1,6 +1,7 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
+import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -67,6 +68,9 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
 
     // TODO Ajouter createdBy et updatedBy : https://docs.spring.io/spring-data/jpa/reference/auditing.html
 }

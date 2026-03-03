@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(user, getAuthorities(user));
     }
 
-    private Collection<GrantedAuthority> getAuthorities(User user) {
+    public Collection<GrantedAuthority> getAuthorities(User user) {
         return user.getRoles().stream()
             .flatMap(role -> Stream.concat(
                 Stream.of(new SimpleGrantedAuthority("ROLE_" + role.getName())),
