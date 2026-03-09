@@ -42,7 +42,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void createUser_shouldReturn201() throws Exception {
+    void createUser_shouldReturn201() {
         CreateUserRequest request = CreateUserRequest.builder()
             .email("john@doe.com")
             .password("secret123")
@@ -80,7 +80,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void createUser_shouldReturn400_whenEmailInvalid() throws Exception {
+    void createUser_shouldReturn400_whenEmailInvalid() {
         CreateUserRequest invalidRequest = CreateUserRequest.builder()
             .email("pas-un-email") // Déclenchera @Email
             .password("123")

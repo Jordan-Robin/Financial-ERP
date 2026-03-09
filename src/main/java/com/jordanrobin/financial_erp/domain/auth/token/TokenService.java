@@ -31,7 +31,7 @@ public class TokenService {
             .collect(Collectors.joining(" "));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
-            .issuer("financial-erp")
+            .issuer("https://financial-erp.com")
             .issuedAt(now)
             .expiresAt(now.plus(ACCESS_TOKEN_EXPIRY_SECONDS, ChronoUnit.SECONDS))
             .subject(userDetails.getUser().getId().toString())
