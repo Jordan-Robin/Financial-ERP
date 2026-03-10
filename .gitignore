@@ -1,4 +1,3 @@
-HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -43,3 +42,8 @@ Thumbs.db
 
 ### Docker ###
 .docker/
+
+### RSA keys ###
+src/main/resources/certs/
+
+notes.txt
