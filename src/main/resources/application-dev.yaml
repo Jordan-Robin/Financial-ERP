@@ -8,3 +8,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem

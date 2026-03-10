@@ -2,8 +2,7 @@ package com.jordanrobin.financial_erp.shared.security;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
-import com.jordanrobin.financial_erp.shared.exception.SecurityExceptions;
-import org.jspecify.annotations.Nullable;
+import com.jordanrobin.financial_erp.shared.exception.api.SecurityExceptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

@@ -2,7 +2,6 @@ package com.jordanrobin.financial_erp.domain.auth.role;
 
 import com.jordanrobin.financial_erp.domain.auth.privilege.Privilege;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -29,10 +28,9 @@ public class Role {
     @Column(name = "role_id")
     private Long id;
 
-    @NotBlank
-    @Size(max = 25)
-    @Column(nullable = false, unique = true, length = 25)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true, length = 50)
+    private RoleName name;
 
     private String description;
 

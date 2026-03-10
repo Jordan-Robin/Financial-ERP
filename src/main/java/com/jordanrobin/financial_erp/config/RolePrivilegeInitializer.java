@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import com.jordanrobin.financial_erp.domain.auth.privilege.Privilege;
 import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName;
-import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeRepository;
+import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeService;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
-import com.jordanrobin.financial_erp.domain.auth.role.RoleRepository;
+import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
@@ -27,19 +27,21 @@ import static com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName.
 @RequiredArgsConstructor
 public class RolePrivilegeInitializer implements ApplicationRunner {
 
-    private final PrivilegeRepository privilegeRepository;
-    private final RoleRepository roleRepository;
+    private final PrivilegeService privilegeService;
+    private final RoleService roleService;
 
     @Override
     @Transactional
     public void run(@NonNull ApplicationArguments args) {
         // 1. Upsert des privilèges
         Map<PrivilegeName, Privilege> privileges = Arrays.stream(PrivilegeName.values())
-            .map(pn -> privilegeRepository.findByName(pn.name())
-                .orElseGet(() -> privilegeRepository.save(
-                    Privilege.builder().name(pn.name()).description(pn.getDescription()).build())))
+            .map(pn -> privilegeService.findByName(pn)
+                .orElseGet(() -> privilegeService.save(
+                    Privilege.builder().name(pn).description(pn.getDescription()).build())))
             .collect(Collectors.toMap(
-                p -> PrivilegeName.valueOf(p.getName()), p -> p));
+                Privilege::getName,
+                p -> p
+            ));
 
         // 2. Upsert des rôles avec leurs privilèges
         upsertRole(RoleName.SUPER_ADMIN, new HashSet<>(privileges.values()));
@@ -53,14 +55,11 @@ public class RolePrivilegeInitializer implements ApplicationRunner {
     }
 
     void upsertRole(RoleName roleName, Set<Privilege> privileges) {
-        Role role = roleRepository.findByName(roleName.name())
-            .orElseGet(() -> Role.builder()
-                .name(roleName.name())
-                .description(roleName.getDescription())
-                .build());
+        Role role = roleService.findByName(roleName)
+            .orElseGet(() -> roleService.createRole(roleName));
         if (!role.getPrivileges().equals(privileges)) {
             role.setPrivileges(new HashSet<>(privileges));
-            roleRepository.save(role);
+            roleService.save(role);
         }
     }
 

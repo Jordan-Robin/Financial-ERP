@@ -2,7 +2,7 @@ package com.jordanrobin.financial_erp.shared.security;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
-import com.jordanrobin.financial_erp.shared.exception.SecurityExceptions;
+import com.jordanrobin.financial_erp.shared.exception.api.SecurityExceptions;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

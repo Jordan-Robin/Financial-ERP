@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,11 +12,13 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     @Getter
+    @NonNull
     private final User user;
 
     private final Collection<GrantedAuthority> authorities;
 
-    public CustomUserDetails(User user, Collection<GrantedAuthority> authorities) {
+    public CustomUserDetails(@NonNull User user, Collection<GrantedAuthority> authorities) {
+        Assert.notNull(user, "User ne peut pas être null");
         this.user = user;
         this.authorities = List.copyOf(authorities);
     }

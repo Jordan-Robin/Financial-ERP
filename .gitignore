@@ -43,4 +43,7 @@ Thumbs.db
 ### Docker ###
 .docker/
 
+### RSA keys ###
+src/main/resources/certs/
+
 notes.txt
