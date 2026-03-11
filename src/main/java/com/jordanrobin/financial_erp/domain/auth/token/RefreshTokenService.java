@@ -1,4 +1,5 @@
 package com.jordanrobin.financial_erp.domain.auth.token;
+
 import com.jordanrobin.financial_erp.domain.auth.user.User;
 import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import lombok.RequiredArgsConstructor;

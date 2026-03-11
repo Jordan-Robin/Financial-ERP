@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +33,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getById(Long id) {
+    public UserResponse getById(UUID id) {
         return userRepository.findById(id)
             .map(userMapper::toResponse)
             .orElseThrow(() -> new UserExceptions.UserNotFoundException(id.toString()));

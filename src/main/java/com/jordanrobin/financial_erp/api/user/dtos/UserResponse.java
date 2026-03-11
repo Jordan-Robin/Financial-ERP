@@ -4,10 +4,11 @@ import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import lombok.Builder;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Builder
 public record UserResponse(
-    Long id,
+    UUID id,
     String email,
     String firstName,
     String lastName,

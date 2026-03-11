@@ -2,10 +2,7 @@ package com.jordanrobin.financial_erp.config;
 
 import com.jordanrobin.financial_erp.domain.auth.privilege.Privilege;
 import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName;
-import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeRepository;
-import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeService;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
-import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +23,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RolePrivilegeInitializerTest {
-
-    @Mock
-    private PrivilegeService privilegeService;
 
     @Mock
     private RoleService roleService;

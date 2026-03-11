@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Tag(name = "Users", description = "Gestion des utilisateurs")
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Utilisateur trouvé")
     @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable("id") Long userId) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable("id") UUID userId) {
         UserResponse response = userService.getById(userId);
         return ResponseEntity.ok(response);
     }

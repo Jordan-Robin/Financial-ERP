@@ -52,6 +52,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(SWAGGER_PATHS).permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
+
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptions -> exceptions

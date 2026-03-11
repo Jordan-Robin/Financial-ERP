@@ -1,5 +1,6 @@
 package com.jordanrobin.financial_erp.api.user;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.config.SecurityConfig;
