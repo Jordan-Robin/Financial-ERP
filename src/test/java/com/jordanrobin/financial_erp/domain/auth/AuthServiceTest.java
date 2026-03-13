@@ -43,7 +43,6 @@ class AuthServiceTest {
     private AuthService authService;
 
     private User user;
-    private CustomUserDetails userDetails;
     private Authentication authentication;
     private RefreshToken refreshToken;
 
@@ -54,7 +53,7 @@ class AuthServiceTest {
             .email("test@test.com")
             .build();
 
-        userDetails = new CustomUserDetails(
+        CustomUserDetails userDetails = new CustomUserDetails(
             user,
             List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );

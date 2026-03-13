@@ -40,15 +40,14 @@ public class RefreshTokenService {
             throw new InvalidRefreshTokenException("Refresh token expiré");
         }
 
-        refreshTokenRepository.revokeById(refreshToken.getId());
+        refreshToken.setRevoked(true);
 
         return refreshToken;
     }
 
     @Transactional
     public void revoke(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token introuvable"));
-        refreshTokenRepository.revokeById(refreshToken.getId());
+        refreshTokenRepository.findByToken(token)
+            .ifPresent(t -> t.setRevoked(true));
     }
 }

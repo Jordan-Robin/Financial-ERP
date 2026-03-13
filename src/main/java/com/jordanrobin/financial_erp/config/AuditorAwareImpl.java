@@ -16,13 +16,14 @@ public class AuditorAwareImpl implements AuditorAware<UUID> {
 
     @Override
     public Optional<UUID> getCurrentAuditor() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-            .filter(Authentication::isAuthenticated)
-            .map(auth -> {
-                if (auth.getPrincipal() instanceof CustomUserDetails userDetails) {
-                    return userDetails.getUser().getId();
-                }
-                return null;
-            });
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(authentication.getPrincipal())
+            .filter(p -> p instanceof CustomUserDetails)
+            .map(p -> ((CustomUserDetails) p).getUser().getId());
     }
 }
