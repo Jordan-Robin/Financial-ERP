@@ -3,6 +3,8 @@ package com.jordanrobin.financial_erp.domain.auth.token;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,11 +20,15 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import java.time.Instant;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("TokenService")
 class TokenServiceTest {
 
     @Mock
@@ -31,19 +37,16 @@ class TokenServiceTest {
     @InjectMocks
     private TokenService tokenService;
 
-    private User user;
-    private CustomUserDetails userDetails;
     private Authentication authentication;
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-            .id(1L)
+        User user = User.builder()
             .email("test@test.com")
             .password("encoded_password")
             .build();
 
-        userDetails = new CustomUserDetails(
+        CustomUserDetails userDetails = new CustomUserDetails(
             user,
             List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
@@ -53,78 +56,81 @@ class TokenServiceTest {
         );
     }
 
-    @Test
-    void generateAccessToken_shouldReturnTokenValue() {
-        Jwt jwt = Jwt.withTokenValue("mocked.jwt.token")
-            .header("alg", "RS256")
-            .claim("sub", "1")
-            .issuedAt(Instant.now())
-            .expiresAt(Instant.now().plusSeconds(900))
-            .build();
+    @Nested
+    @DisplayName("generateAccessToken()")
+    class GenerateAccessToken {
 
-        when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
+        private Jwt mockJwt() {
+            return Jwt.withTokenValue("mocked.jwt.token")
+                .header("alg", "RS256")
+                .claim("sub", "1")
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(900))
+                .build();
+        }
 
-        String token = tokenService.generateAccessToken(authentication);
+        @Test
+        @DisplayName("Retourne la valeur du token généré par le JwtEncoder")
+        void shouldReturnTokenValue() {
+            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
 
-        assertThat(token).isEqualTo("mocked.jwt.token");
+            String token = tokenService.generateAccessToken(authentication);
+
+            assertThat(token).isEqualTo("mocked.jwt.token");
+        }
+
+        @Test
+        @DisplayName("Encode les bons claims : email, subject, scope, issuer")
+        void shouldEncodeCorrectClaims() {
+            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
+
+            tokenService.generateAccessToken(authentication);
+
+            verify(jwtEncoder).encode(argThat(params -> {
+                var claims = params.getClaims();
+                return "test@test.com".equals(claims.getClaim("email"))
+                    && "1".equals(claims.getSubject())
+                    && claims.getClaim("scope").toString().contains("ROLE_USER")
+                    && "https://financial-erp.com".equals(claims.getIssuer().toString());
+            }));
+        }
+
+        @Test
+        @DisplayName("Définit une expiration de 900 secondes")
+        void shouldSetExpirationTo900Seconds() {
+            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
+
+            tokenService.generateAccessToken(authentication);
+
+            verify(jwtEncoder).encode(argThat(params -> {
+                Instant issuedAt = params.getClaims().getIssuedAt();
+                Instant expiresAt = params.getClaims().getExpiresAt();
+                long diff = expiresAt.getEpochSecond() - issuedAt.getEpochSecond();
+                return diff == 900L;
+            }));
+        }
+
+        @Test
+        @DisplayName("Lève IllegalStateException quand le principal n'est pas un CustomUserDetails")
+        void shouldThrowWhenPrincipalIsNotCustomUserDetails() {
+            Authentication invalidAuth = new UsernamePasswordAuthenticationToken(
+                "just-a-string", null, List.of()
+            );
+
+            assertThatThrownBy(() -> tokenService.generateAccessToken(invalidAuth))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("invalide");
+        }
     }
 
-    @Test
-    void generateAccessToken_shouldEncodeCorrectClaims() {
-        Jwt jwt = Jwt.withTokenValue("mocked.jwt.token")
-            .header("alg", "RS256")
-            .claim("sub", "1")
-            .issuedAt(Instant.now())
-            .expiresAt(Instant.now().plusSeconds(900))
-            .build();
+    @Nested
+    @DisplayName("getAccessTokenExpirySeconds()")
+    class GetAccessTokenExpirySeconds {
 
-        when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
-
-        tokenService.generateAccessToken(authentication);
-
-        verify(jwtEncoder).encode(argThat(params -> {
-            var claims = params.getClaims();
-            return claims.getClaim("email").equals("test@test.com")
-                && claims.getSubject().equals("1")
-                && claims.getClaim("scope").toString().contains("ROLE_USER")
-                && claims.getIssuer().toString().equals("https://financial-erp.com");
-        }));
-    }
-
-    @Test
-    void generateAccessToken_shouldSetExpirationTo900Seconds() {
-        Jwt jwt = Jwt.withTokenValue("mocked.jwt.token")
-            .header("alg", "RS256")
-            .claim("sub", "1")
-            .issuedAt(Instant.now())
-            .expiresAt(Instant.now().plusSeconds(900))
-            .build();
-
-        when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
-
-        tokenService.generateAccessToken(authentication);
-
-        verify(jwtEncoder).encode(argThat(params -> {
-            Instant issuedAt = params.getClaims().getIssuedAt();
-            Instant expiresAt = params.getClaims().getExpiresAt();
-            long diff = expiresAt.getEpochSecond() - issuedAt.getEpochSecond();
-            return diff == 900L;
-        }));
-    }
-
-    @Test
-    void generateAccessToken_shouldThrowWhenPrincipalIsNotCustomUserDetails() {
-        Authentication invalidAuth = new UsernamePasswordAuthenticationToken(
-            "just-a-string", null, List.of()
-        );
-
-        assertThatThrownBy(() -> tokenService.generateAccessToken(invalidAuth))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("invalide");
-    }
-
-    @Test
-    void getAccessTokenExpirySeconds_shouldReturn900() {
-        assertThat(TokenService.getAccessTokenExpirySeconds()).isEqualTo(900L);
+        @Test
+        @DisplayName("Retourne 900 secondes (15 minutes)")
+        void shouldReturn900() {
+            assertThat(TokenService.getAccessTokenExpirySeconds()).isEqualTo(900L);
+        }
     }
 }

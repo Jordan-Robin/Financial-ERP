@@ -3,6 +3,7 @@ package com.jordanrobin.financial_erp.shared.security;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
 import com.jordanrobin.financial_erp.shared.exception.api.SecurityExceptions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -21,6 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("SecurityUtils - getCurrentUser()")
 class SecurityUtilsTest {
 
     private final SecurityUtils securityUtils = new SecurityUtils();
@@ -29,18 +31,7 @@ class SecurityUtilsTest {
     private SecurityContext securityContext;
 
     @Test
-    void getCurrentUser_shouldThrow_whenNotAuthenticated() {
-        try (MockedStatic<SecurityContextHolder> mockedHolder = mockStatic(SecurityContextHolder.class)) {
-            given(securityContext.getAuthentication()).willReturn(null);
-            mockedHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
-
-            assertThatThrownBy(securityUtils::getCurrentUser)
-                .isInstanceOf(SecurityExceptions.UnauthorizedException.class)
-                .hasMessage("No authenticated user found.");
-        }
-    }
-
-    @Test
+    @DisplayName("Retourne l'utilisateur courant quand l'authentification est valide")
     void getCurrentUser_shouldReturnUser_whenAuthenticated() {
         User user = User.builder()
             .email("test@example.com")
@@ -62,6 +53,20 @@ class SecurityUtilsTest {
     }
 
     @Test
+    @DisplayName("Lève UnauthorizedException quand aucune authentification n'est présente")
+    void getCurrentUser_shouldThrow_whenNotAuthenticated() {
+        try (MockedStatic<SecurityContextHolder> mockedHolder = mockStatic(SecurityContextHolder.class)) {
+            given(securityContext.getAuthentication()).willReturn(null);
+            mockedHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+
+            assertThatThrownBy(securityUtils::getCurrentUser)
+                .isInstanceOf(SecurityExceptions.UnauthorizedException.class)
+                .hasMessage("No authenticated user found.");
+        }
+    }
+
+    @Test
+    @DisplayName("Lève UnauthorizedException quand le principal n'est pas un CustomUserDetails")
     void getCurrentUser_shouldThrow_whenPrincipalIsNotCustomUserDetails() {
         Authentication auth = new UsernamePasswordAuthenticationToken(
             "anonymousUser", null, List.of()

@@ -1,9 +1,8 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
 import com.jordanrobin.financial_erp.domain.auth.privilege.Privilege;
-import com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
-import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("CustomUserDetailsService - loadUserByUsername()")
 class CustomUserDetailsServiceTest {
 
     @Mock
@@ -32,6 +32,7 @@ class CustomUserDetailsServiceTest {
     private CustomUserDetailsService userDetailsService;
 
     @Test
+    @DisplayName("Retourne un UserDetails avec les rôles et privilèges quand l'utilisateur existe")
     void loadByUsername_shouldReturnUserDetails_whenUserExists() {
         String email = "user@test.com";
         Privilege p1 = Privilege.builder().name(PRIVILEGE_READ).build();
@@ -55,6 +56,7 @@ class CustomUserDetailsServiceTest {
     }
 
     @Test
+    @DisplayName("Lève UsernameNotFoundException quand l'utilisateur est introuvable")
     void loadByUsername_shouldThrow_whenUserNotFound() {
         String email = "unknown@test.com";
 
@@ -64,5 +66,4 @@ class CustomUserDetailsServiceTest {
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("User not found.");
     }
-
 }
