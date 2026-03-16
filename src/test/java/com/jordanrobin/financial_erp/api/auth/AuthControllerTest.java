@@ -5,7 +5,7 @@ import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
 import com.jordanrobin.financial_erp.api.auth.dtos.RefreshRequest;
 import com.jordanrobin.financial_erp.domain.auth.AuthService;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
-import com.jordanrobin.financial_erp.infrastructure.security.SecurityUtils;
+import com.jordanrobin.financial_erp.infrastructure.security.SecurityConfig;
 import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityUtils.SecurityConfig.class)
+@Import(SecurityConfig.class)
 @AutoConfigureRestTestClient
 @DisplayName("Contrôleur d'Authentification (AuthController)")
 class AuthControllerTest {
