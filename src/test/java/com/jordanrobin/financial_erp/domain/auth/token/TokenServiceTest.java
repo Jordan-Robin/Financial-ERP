@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,6 +39,7 @@ class TokenServiceTest {
     private TokenService tokenService;
 
     private Authentication authentication;
+    private final UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
     @BeforeEach
     void setUp() {
@@ -45,6 +47,7 @@ class TokenServiceTest {
             .email("test@test.com")
             .password("encoded_password")
             .build();
+        user.setId(userId);
 
         CustomUserDetails userDetails = new CustomUserDetails(
             user,
@@ -89,7 +92,7 @@ class TokenServiceTest {
             verify(jwtEncoder).encode(argThat(params -> {
                 var claims = params.getClaims();
                 return "test@test.com".equals(claims.getClaim("email"))
-                    && "1".equals(claims.getSubject())
+                    && userId.toString().equals(claims.getSubject())
                     && claims.getClaim("scope").toString().contains("ROLE_USER")
                     && "https://financial-erp.com".equals(claims.getIssuer().toString());
             }));

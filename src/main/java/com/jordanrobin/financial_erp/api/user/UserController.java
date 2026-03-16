@@ -36,8 +36,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Utilisateur trouvé")
     @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
-        UserResponse response = userService.getById(userId);
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID id) {
+        UserResponse response = userService.getById(id);
         return ResponseEntity.ok(response);
     }
 }

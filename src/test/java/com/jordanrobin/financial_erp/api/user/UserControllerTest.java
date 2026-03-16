@@ -147,7 +147,7 @@ class UserControllerTest {
     class GetUser {
 
         @Test
-        @DisplayName("Succes : Retourne 200 avec l'utilisateur quand JWT valide")
+        @DisplayName("Succès : Retourne 200 avec l'utilisateur quand JWT valide")
         void shouldReturn200_whenAuthenticated() {
             when(userService.getById(mockUserId)).thenReturn(MOCK_USER_RESPONSE);
 
@@ -165,7 +165,7 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("Erreur 401 : Acces refuse sans token")
+        @DisplayName("Erreur 401 : Accès refusé sans token")
         void shouldReturn401_whenNotAuthenticated() {
             assertThat(mvc.get().uri("/api/users/{id}", mockUserId))
                 .hasStatus(HttpStatus.UNAUTHORIZED);
