@@ -1,6 +1,6 @@
 package com.jordanrobin.financial_erp.domain.auth.role;
 
-import com.jordanrobin.financial_erp.shared.exception.domain.RoleExceptions;
+import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class RoleService {
 
     public Role findByNameOrThrow(RoleName roleName) {
         return roleRepository.findByName(roleName)
-            .orElseThrow(() -> new RoleExceptions.RoleNotFoundException(roleName.name()));
+            .orElseThrow(() -> new ResourceNotFoundException(Role.class.getSimpleName(), roleName.name()));
     }
 
     public Optional<Role> findByName(RoleName roleName) {

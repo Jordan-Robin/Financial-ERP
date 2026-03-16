@@ -6,8 +6,8 @@ import com.jordanrobin.financial_erp.api.user.mappers.UserMapper;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
-import com.jordanrobin.financial_erp.shared.exception.domain.RoleExceptions;
 import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
+import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -178,8 +178,8 @@ class UserServiceTest {
         }
 
         @Test
-        @DisplayName("Lève RoleNotFoundException quand le rôle n'existe pas en base")
-        void shouldThrowRoleNotFoundException_whenRoleDoesNotExist() {
+        @DisplayName("Lève ResourceNotFoundException quand le rôle n'existe pas en base")
+        void shouldThrowResourceNotFoundException_whenRoleDoesNotExist() {
             CreateUserRequest request = CreateUserRequest.builder()
                 .email("john.doe@email.com")
                 .password("secret")
@@ -194,10 +194,10 @@ class UserServiceTest {
             when(userMapper.toEntity(request)).thenReturn(user);
             when(passwordEncoder.encode(any())).thenReturn("encoded");
             when(roleService.findByNameOrThrow(CFO))
-                .thenThrow(new RoleExceptions.RoleNotFoundException(CFO.name()));
+                .thenThrow(new ResourceNotFoundException(Role.class.getSimpleName(), CFO.name()));
 
             assertThatThrownBy(() -> userService.create(request))
-                .isInstanceOf(RoleExceptions.RoleNotFoundException.class)
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("CFO");
         }
     }

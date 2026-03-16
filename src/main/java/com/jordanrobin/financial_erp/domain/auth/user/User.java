@@ -4,7 +4,7 @@ import com.jordanrobin.financial_erp.domain.BaseEntity;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.HashSet;
@@ -20,21 +20,15 @@ import java.util.Set;
 public class User extends BaseEntity {
 
     @NotBlank()
-    @Email()
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
-    @NotBlank()
-    @Column(nullable = false)
+    @Column
     private String password;
 
-    @NotBlank()
-    @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String lastName;
 
-    @NotBlank()
-    @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String firstName;
 

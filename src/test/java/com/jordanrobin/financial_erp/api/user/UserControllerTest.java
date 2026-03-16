@@ -2,10 +2,10 @@ package com.jordanrobin.financial_erp.api.user;
 
 import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
-import com.jordanrobin.financial_erp.config.SecurityConfig;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.UserService;
+import com.jordanrobin.financial_erp.infrastructure.security.SecurityUtils;
 import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 @WebMvcTest(UserController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityUtils.SecurityConfig.class)
 @DisplayName("Contrôleur Utilisateurs (UserController)")
 class UserControllerTest {
 

@@ -32,11 +32,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Récupérer un utilisateur par ID")
+    @Operation(summary = "Récupérer un utilisateur avec son ID")
     @ApiResponse(responseCode = "200", description = "Utilisateur trouvé")
     @ApiResponse(responseCode = "404", description = "Utilisateur introuvable")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable("id") UUID userId) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
         UserResponse response = userService.getById(userId);
         return ResponseEntity.ok(response);
     }

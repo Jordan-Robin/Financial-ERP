@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.config;
+package com.jordanrobin.financial_erp.infrastructure.persistence;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import org.jspecify.annotations.NullMarked;

@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.config;
+package com.jordanrobin.financial_erp.infrastructure.persistence;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
