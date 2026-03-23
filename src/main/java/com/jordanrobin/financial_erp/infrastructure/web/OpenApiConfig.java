@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.config;
+package com.jordanrobin.financial_erp.infrastructure.web;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
