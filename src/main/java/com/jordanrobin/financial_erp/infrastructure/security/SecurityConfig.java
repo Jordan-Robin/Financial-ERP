@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.config;
+package com.jordanrobin.financial_erp.infrastructure.security;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.shared.exception.ErrorResponse;
@@ -29,8 +29,8 @@ import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
-@EnableConfigurationProperties(RsaKeyProperties.class)
+@EnableMethodSecurity()
+@EnableConfigurationProperties({RsaKeyProperties.class, JwtProperties.class})
 @RequiredArgsConstructor
 public class SecurityConfig {
 

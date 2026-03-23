@@ -1,8 +1,8 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
-import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
-import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
-import com.jordanrobin.financial_erp.api.user.mappers.UserMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
 import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,29 +21,29 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final UserDomainMapper userDomainMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
 
     @Transactional(readOnly = true)
     public UserResponse getByEmail(String email) {
         return userRepository.findByEmail(email)
-            .map(userMapper::toResponse)
+            .map(userDomainMapper::entityToResponse)
             .orElseThrow(() -> new UserExceptions.UserNotFoundException(email));
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getById(Long id) {
+    public UserResponse getById(UUID id) {
         return userRepository.findById(id)
-            .map(userMapper::toResponse)
+            .map(userDomainMapper::entityToResponse)
             .orElseThrow(() -> new UserExceptions.UserNotFoundException(id.toString()));
     }
 
-    public UserResponse create(CreateUserRequest request) {
+    public UserResponse create(CreateUserCommand request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new UserExceptions.EmailAlreadyExistsException(request.email());
         }
-        User user = userMapper.toEntity(request);
+        User user = userDomainMapper.commandToEntity(request);
         user.setPassword(passwordEncoder.encode(request.password()));
 
         Set<Role> roles = request.roles().stream()
@@ -50,7 +51,7 @@ public class UserService {
             .collect(Collectors.toSet());
         user.setRoles(roles);
 
-        return userMapper.toResponse(userRepository.save(user));
+        return userDomainMapper.entityToResponse(userRepository.save(user));
     }
 
 }

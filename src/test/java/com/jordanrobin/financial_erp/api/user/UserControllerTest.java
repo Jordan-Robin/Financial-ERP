@@ -1,38 +1,36 @@
 package com.jordanrobin.financial_erp.api.user;
 
-import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
-import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
-import com.jordanrobin.financial_erp.config.SecurityConfig;
-import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
+import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapper;
+import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapperImpl;
+import com.jordanrobin.financial_erp.base.BaseControllerTest;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.UserService;
+import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.infrastructure.security.SecurityConfig;
+import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.client.RestTestClient;
-import tools.jackson.databind.ObjectMapper;
+import java.util.UUID;
 
-import java.util.Set;
-
+import static com.jordanrobin.financial_erp.fixtures.JwtTokenFixtures.createTenantAdminToken;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.createViewerUserRequestBuilder;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.viewerUserResponseBuilder;
+import static com.jordanrobin.financial_erp.utils.JsonUtils.fromPath;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest(UserController.class)
-@Import(SecurityConfig.class)
-@AutoConfigureRestTestClient
-class UserControllerTest {
-
-    @Autowired
-    private RestTestClient restTestClient;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+@Import({SecurityConfig.class, UserApiMapperImpl.class})
+@DisplayName("UserController")
+class UserControllerTest extends BaseControllerTest {
 
     @MockitoBean
     private UserService userService;
@@ -40,61 +38,82 @@ class UserControllerTest {
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void createUser_shouldReturn201() {
-        CreateUserRequest request = CreateUserRequest.builder()
-            .email("john@doe.com")
-            .password("secret123")
-            .firstName("John")
-            .lastName("Doe")
-            .roles(Set.of(RoleName.TENANT_ADMIN))
-            .build();
+    @Nested
+    @DisplayName("POST /api/users - create()")
+    class CreateUser {
 
-        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of(RoleName.TENANT_ADMIN));
+        @Test
+        @DisplayName("Succès : retourne 201")
+        @SneakyThrows
+        void shouldReturn201_whenValid() {
+            var request = createViewerUserRequestBuilder().build();
+            var response = viewerUserResponseBuilder().build();
+            when(userService.create(any(CreateUserCommand.class))).thenReturn(response);
 
-        when(userService.create(any(CreateUserRequest.class))).thenReturn(response);
+            var result = post("/api/users", createTenantAdminToken(), request);
 
-        restTestClient.post().uri("/api/users")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .exchange()
-            .expectStatus().isCreated()
-            .expectBody()
-            .jsonPath("$.id").isEqualTo(1L)
-            .jsonPath("$.email").isEqualTo("john@doe.com");
+            assertThat(result)
+                .hasStatus(201)
+                .bodyJson()
+                .returns("john@doe.com", fromPath("$.email"))
+                .returns("John", fromPath("$.firstName"));
+        }
+
+        @Test
+        @DisplayName("Erreur 400 : format d'email invalide")
+        @SneakyThrows
+        void shouldReturn400_whenEmailInvalid() {
+            var request = createViewerUserRequestBuilder().email("bad-email").build();
+
+            var result = post("/api/users", createTenantAdminToken(), request);
+
+            assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+            verifyNoInteractions(userService);
+        }
+
+        @Test
+        @DisplayName("Erreur 409 : email déjà utilisé")
+        @SneakyThrows
+        void shouldReturn409_whenEmailAlreadyExists() {
+            var request = createViewerUserRequestBuilder().build();
+            when(userService.create(any()))
+                .thenThrow(new UserExceptions.EmailAlreadyExistsException("john@doe.com"));
+
+            var result = post("/api/users", createTenantAdminToken(), request);
+
+            assertThat(result).hasStatus(HttpStatus.CONFLICT);
+        }
     }
 
-    @Test
-    @WithMockUser // Par défaut ROLE_USER
-    void getUser_shouldReturn200() {
-        UserResponse response = new UserResponse(1L, "john@doe.com", "John", "Doe", Set.of(RoleName.VIEWER));
-        when(userService.getById(1L)).thenReturn(response);
+    @Nested
+    @DisplayName("GET /api/users/{id} - findById()")
+    class GetUser {
 
-        restTestClient.get().uri("/api/users/1")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.firstName").isEqualTo("John");
-    }
+        @Test
+        @DisplayName("Succès : retourne 200")
+        void shouldReturn200_whenAuthenticated() {
+            var response = viewerUserResponseBuilder().build();
+            when(userService.getById(any(UUID.class))).thenReturn(response);
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void createUser_shouldReturn400_whenEmailInvalid() {
-        CreateUserRequest invalidRequest = CreateUserRequest.builder()
-            .email("pas-un-email") // Déclenchera @Email
-            .password("123")
-            .firstName("J")
-            .lastName("D")
-            .roles(Set.of(RoleName.VIEWER))
-            .build();
+            var result = get("/api/users/{id}", createTenantAdminToken(), UUID.randomUUID());
 
-        restTestClient.post().uri("/api/users")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(objectMapper.writeValueAsString(invalidRequest))
-            .exchange()
-            .expectStatus().isBadRequest();
+            assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .returns("john@doe.com", fromPath("$.email"))
+                .returns("John", fromPath("$.firstName"));
+        }
 
-        verifyNoInteractions(userService);
+        @Test
+        @DisplayName("Erreur 404 : Utilisateur introuvable")
+        void shouldReturn404_whenUserNotFound() {
+            UUID unknownId = UUID.randomUUID();
+            when(userService.getById(any(UUID.class)))
+                .thenThrow(new UserExceptions.UserNotFoundException(unknownId.toString()));
+
+            var result = get("/api/users/{id}",createTenantAdminToken(), unknownId);
+
+            assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+        }
     }
 }

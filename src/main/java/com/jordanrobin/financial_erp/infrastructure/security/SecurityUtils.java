@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.shared.security;
+package com.jordanrobin.financial_erp.infrastructure.security;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
@@ -7,8 +7,8 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
 import java.util.Objects;
+import java.util.UUID;
 
 @Component
 @NullMarked
@@ -32,7 +32,7 @@ public class SecurityUtils {
         return getCurrentUser().getEmail();
     }
 
-    public Long getCurrentUserId() {
+    public UUID getCurrentUserId() {
         return getCurrentUser().getId();
     }
 
