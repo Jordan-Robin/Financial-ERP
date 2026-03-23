@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(httpStatus).body(new ErrorResponse(ex.getMessage()));
     }
 
+    // TODO préciser quel champ en erreur (ex. roles de CreateUserRequest)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleInvalidJson(HttpMessageNotReadableException ex) {
         String userMessage = "Le format du JSON est invalide ou un type de donnée est incorrect.";
@@ -51,5 +53,11 @@ public class GlobalExceptionHandler {
             ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(message));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse("La ressource demandée est introuvable."));
     }
 }
