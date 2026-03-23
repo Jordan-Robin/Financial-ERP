@@ -1,7 +1,8 @@
 package com.jordanrobin.financial_erp.api.organization;
 
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
-import com.jordanrobin.financial_erp.api.organization.dtos.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
+import com.jordanrobin.financial_erp.api.organization.mappers.OrganizationApiMapper;
 import com.jordanrobin.financial_erp.domain.organization.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class OrganizationController {
 
     private final OrganizationService organizationService;
+    private final OrganizationApiMapper organizationApiMapper;
 
     @Operation(summary = "Créer une organisation")
     @ApiResponse(responseCode = "201", description = "Organisation créée")
@@ -28,7 +30,7 @@ public class OrganizationController {
     @ApiResponse(responseCode = "409", description = "Organisation déjà existante avec ce Siren")
     @PostMapping
     public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody CreateOrganizationRequest request) {
-        OrganizationResponse response = organizationService.create(request);
+        OrganizationResponse response = organizationService.create(organizationApiMapper.dtoToCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

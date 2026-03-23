@@ -30,7 +30,7 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity()
-@EnableConfigurationProperties(RsaKeyProperties.class)
+@EnableConfigurationProperties({RsaKeyProperties.class, JwtProperties.class})
 @RequiredArgsConstructor
 public class SecurityConfig {
 

@@ -1,10 +1,9 @@
 package com.jordanrobin.financial_erp.domain.auth;
 
-import com.jordanrobin.financial_erp.api.auth.dtos.AuthResponse;
-import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
 import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
 import com.jordanrobin.financial_erp.domain.auth.token.RefreshTokenService;
 import com.jordanrobin.financial_erp.domain.auth.token.TokenService;
+import com.jordanrobin.financial_erp.domain.auth.token.model.TokenPair;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,14 +23,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static com.jordanrobin.financial_erp.fixtures.JwtTokenFixtures.createRefreshToken;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.adminUserBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,9 +57,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-            .email("test@test.com")
-            .build();
+        user = adminUserBuilder().build();
 
         CustomUserDetails userDetails = new CustomUserDetails(
             user,
@@ -70,12 +68,7 @@ class AuthServiceTest {
             userDetails, null, userDetails.getAuthorities()
         );
 
-        refreshToken = RefreshToken.builder()
-            .token("refresh-token")
-            .user(user)
-            .revoked(false)
-            .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
-            .build();
+        refreshToken = createRefreshToken().user(user).build();
     }
 
     @Nested
@@ -83,45 +76,43 @@ class AuthServiceTest {
     class Login {
 
         @Test
-        @DisplayName("Retourne un AuthResponse avec les tokens quand les credentials sont valides")
-        void shouldReturnAuthResponse() {
-            when(authenticationManager.authenticate(any())).thenReturn(authentication);
-            when(tokenService.generateAccessToken(authentication)).thenReturn("access-token");
-            when(refreshTokenService.create(user)).thenReturn(refreshToken);
-
-            AuthResponse response = authService.login(new LoginRequest("test@test.com", "password"));
-
-            assertThat(response.accessToken()).isEqualTo("access-token");
-            assertThat(response.refreshToken()).isEqualTo("refresh-token");
-            assertThat(response.type()).isEqualTo("Bearer");
-            assertThat(response.expiresIn()).isEqualTo(900L);
-        }
-
-        @Test
-        @DisplayName("Lève BadCredentialsException quand les credentials sont invalides")
-        void shouldThrowWhenCredentialsInvalid() {
-            when(authenticationManager.authenticate(any()))
-                .thenThrow(new BadCredentialsException("Credentials invalides"));
-
-            assertThatThrownBy(() -> authService.login(new LoginRequest("test@test.com", "wrong")))
-                .isInstanceOf(BadCredentialsException.class);
-        }
-
-        @Test
-        @DisplayName("Appelle AuthenticationManager avec les bons credentials")
-        void shouldCallAuthenticationManagerWithCorrectCredentials() {
+        @DisplayName("Succès : retourne un AuthResponse")
+        void shouldAuthenticateAndReturnTokens() {
+            // Arrange
+            String email = "test@test.com";
+            String password = "password";
             when(authenticationManager.authenticate(any())).thenReturn(authentication);
             when(tokenService.generateAccessToken(any())).thenReturn("access-token");
             when(refreshTokenService.create(any())).thenReturn(refreshToken);
 
-            authService.login(new LoginRequest("test@test.com", "password"));
+            // Act
+            TokenPair result = authService.login(email, password);
 
-            verify(authenticationManager).authenticate(
-                argThat(auth ->
-                    "test@test.com".equals(auth.getPrincipal()) &&
-                        "password".equals(auth.getCredentials())
-                )
-            );
+            // Assert
+            assertThat(result.accessToken()).isEqualTo("access-token");
+            assertThat(result.refreshToken()).isEqualTo(refreshToken.getToken());
+
+            // On vérifie que l'objet créé à la volée dans la méthode est le bon
+            ArgumentCaptor<UsernamePasswordAuthenticationToken> authCaptor =
+                ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
+
+            verify(authenticationManager).authenticate(authCaptor.capture());
+
+            UsernamePasswordAuthenticationToken captured = authCaptor.getValue();
+            assertThat(captured.getPrincipal()).isEqualTo(email);
+            assertThat(captured.getCredentials()).isEqualTo(password);
+        }
+
+        @Test
+        @DisplayName("Erreur BadCredentialsException : credentials invalides")
+        void shouldThrow_whenCredentialsInvalid() {
+            // Arrange
+            when(authenticationManager.authenticate(any()))
+                .thenThrow(new BadCredentialsException("Credentials invalides"));
+
+            // Act & Assert
+            assertThatThrownBy(() -> authService.login("email", "password"))
+                .isInstanceOf(BadCredentialsException.class);
         }
     }
 
@@ -130,8 +121,9 @@ class AuthServiceTest {
     class Refresh {
 
         @Test
-        @DisplayName("Retourne un nouvel AuthResponse quand le refresh token est valide")
+        @DisplayName("Succès : retourne AuthResponse")
         void shouldReturnNewAuthResponse() {
+            // Arrange
             when(refreshTokenService.validateAndRotate("refresh-token")).thenReturn(refreshToken);
             when(customUserDetailsService.getAuthorities(user))
                 .thenReturn(List.of(new SimpleGrantedAuthority("ROLE_USER")));
@@ -140,20 +132,22 @@ class AuthServiceTest {
                 RefreshToken.builder().token("new-refresh-token").build()
             );
 
-            AuthResponse response = authService.refresh("refresh-token");
+            // Act
+            TokenPair result = authService.refresh("refresh-token");
 
-            assertThat(response.accessToken()).isEqualTo("new-access-token");
-            assertThat(response.refreshToken()).isEqualTo("new-refresh-token");
-            assertThat(response.type()).isEqualTo("Bearer");
-            assertThat(response.expiresIn()).isEqualTo(900L);
+            // Assert
+            assertThat(result.accessToken()).isEqualTo("new-access-token");
+            assertThat(result.refreshToken()).isEqualTo("new-refresh-token");
         }
 
         @Test
-        @DisplayName("Lève InvalidRefreshTokenException quand le refresh token est invalide")
-        void shouldThrowWhenRefreshTokenInvalid() {
+        @DisplayName("Erreur InvalidRefreshTokenException si refresh token invalide")
+        void shouldThrow_whenRefreshTokenIsInvalid() {
+            // Arrange
             when(refreshTokenService.validateAndRotate("invalid-token"))
                 .thenThrow(new InvalidRefreshTokenException("Token invalide"));
 
+            // Act & Assert
             assertThatThrownBy(() -> authService.refresh("invalid-token"))
                 .isInstanceOf(InvalidRefreshTokenException.class);
         }
@@ -164,12 +158,15 @@ class AuthServiceTest {
     class Logout {
 
         @Test
-        @DisplayName("Révoque le refresh token")
+        @DisplayName("Succès : révoque le refresh token")
         void shouldRevokeRefreshToken() {
+            // Arrange
             doNothing().when(refreshTokenService).revoke("refresh-token");
 
+            // Act
             authService.logout("refresh-token");
 
+            // Assert
             verify(refreshTokenService).revoke("refresh-token");
         }
     }

@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.api.organization.dtos;
+package com.jordanrobin.financial_erp.domain.organization.models;
 
 import com.jordanrobin.financial_erp.domain.organization.LegalStatus;
 import lombok.Builder;

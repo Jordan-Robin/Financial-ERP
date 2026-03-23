@@ -1,8 +1,8 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
-import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
-import com.jordanrobin.financial_erp.api.organization.dtos.OrganizationResponse;
-import com.jordanrobin.financial_erp.api.organization.mappers.OrganizationMapper;
+import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.mappers.OrganizationDomainMapper;
+import com.jordanrobin.financial_erp.domain.organization.models.CreateOrganizationCommand;
 import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceAlreadyExistsException;
 import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +17,20 @@ import java.util.UUID;
 public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
-    private final OrganizationMapper organizationMapper;
+    private final OrganizationDomainMapper organizationDomainMapper;
 
-    public OrganizationResponse create(CreateOrganizationRequest request) {
+    public OrganizationResponse create(CreateOrganizationCommand request) {
         if (request.siren() != null && organizationRepository.existsBySiren(request.siren())) {
             throw new ResourceAlreadyExistsException(Organization.class.getSimpleName(), "siren", request.siren());
         }
-        Organization organization = organizationMapper.toEntity(request);
-        return organizationMapper.toResponse(organizationRepository.save(organization));
+        Organization organization = organizationDomainMapper.commandToEntity(request);
+        return organizationDomainMapper.entityToResponse(organizationRepository.save(organization));
     }
 
     @Transactional(readOnly = true)
     public OrganizationResponse getById(UUID id) {
         return organizationRepository.findById(id)
-            .map(organizationMapper::toResponse)
+            .map(organizationDomainMapper::entityToResponse)
             .orElseThrow(() -> new ResourceNotFoundException(Organization.class.getSimpleName(), id.toString()));
     }
 

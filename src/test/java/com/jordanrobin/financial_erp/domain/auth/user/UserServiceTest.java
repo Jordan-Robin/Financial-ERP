@@ -1,8 +1,8 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
-import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
-import com.jordanrobin.financial_erp.api.user.dtos.UserResponse;
-import com.jordanrobin.financial_erp.api.user.mappers.UserMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
@@ -17,15 +17,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.*;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +37,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDomainMapper userDomainMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -53,32 +53,32 @@ class UserServiceTest {
     class GetByEmail {
 
         @Test
-        @DisplayName("Retourne un UserResponse quand l'utilisateur existe")
+        @DisplayName("Succès : retourne un UserResponse")
         void shouldReturnUserResponse_whenUserExists() {
-            String email = "john.doe@email.com";
-            User user = User.builder().email(email).roles(new HashSet<>()).build();
-            UserResponse response = UserResponse.builder()
-                .id(user.getId())
-                .email(email)
-                .build();
+            // Arrange
+            User user = adminUserBuilder().build();
+            UserResponse response = adminUserResponseBuilder().build();
 
-            when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-            when(userMapper.toResponse(user)).thenReturn(response);
+            when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+            when(userDomainMapper.entityToResponse(user)).thenReturn(response);
 
-            UserResponse result = userService.getByEmail(email);
+            // Act
+            UserResponse result = userService.getByEmail(user.getEmail());
 
-            assertThat(result.email()).isEqualTo(email);
-            assertThat(result.id()).isEqualTo(user.getId());
-            verify(userRepository).findByEmail(email);
-            verify(userMapper).toResponse(user);
+            // Assert
+            assertThat(result.email()).isEqualTo(user.getEmail());
+            verify(userRepository).findByEmail(user.getEmail());
+            verify(userDomainMapper).entityToResponse(user);
         }
 
         @Test
-        @DisplayName("Lève UserNotFoundException quand l'utilisateur est introuvable")
+        @DisplayName("Erreur UserNotFoundException quand l'utilisateur est introuvable")
         void shouldThrowUserNotFoundException_whenUserNotFound() {
+            // Arrange
             String email = "unknown@email.com";
             when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
+            // Act & Assert
             assertThatThrownBy(() -> userService.getByEmail(email))
                 .isInstanceOf(UserExceptions.UserNotFoundException.class)
                 .hasMessageContaining(email);
@@ -90,30 +90,32 @@ class UserServiceTest {
     class GetById {
 
         @Test
-        @DisplayName("Retourne un UserResponse quand l'utilisateur existe")
+        @DisplayName("Succès : retourne un UserResponse")
         void shouldReturnUserResponse_whenUserExists() {
-            User user = User.builder().email("john.doe@email.com").roles(new HashSet<>()).build();
-            UserResponse response = UserResponse.builder()
-                .id(user.getId())
-                .email("john.doe@email.com")
-                .build();
+            // Arrange
+            User user = adminUserBuilder().build();
+            UserResponse response = adminUserResponseBuilder().build();
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-            when(userMapper.toResponse(user)).thenReturn(response);
+            when(userDomainMapper.entityToResponse(user)).thenReturn(response);
 
+            // Act
             UserResponse result = userService.getById(user.getId());
 
-            assertThat(result.id()).isEqualTo(user.getId());
+            // Assert
+            assertThat(result.email()).isEqualTo(user.getEmail());
             verify(userRepository).findById(user.getId());
-            verify(userMapper).toResponse(user);
+            verify(userDomainMapper).entityToResponse(user);
         }
 
         @Test
-        @DisplayName("Lève UserNotFoundException quand l'utilisateur est introuvable")
+        @DisplayName("Erreur UserNotFoundException quand l'utilisateur est introuvable")
         void shouldThrowUserNotFoundException_whenUserNotFound() {
-            UUID id = UUID.randomUUID(); // corrigé : UUID au lieu de Long
+            // Arrange
+            UUID id = UUID.randomUUID();
             when(userRepository.findById(id)).thenReturn(Optional.empty());
 
+            // Act & Assert
             assertThatThrownBy(() -> userService.getById(id))
                 .isInstanceOf(UserExceptions.UserNotFoundException.class)
                 .hasMessageContaining(id.toString());
@@ -125,80 +127,62 @@ class UserServiceTest {
     class Create {
 
         @Test
-        @DisplayName("Retourne un UserResponse quand la création réussit")
+        @DisplayName("Succès : retourne un UserResponse")
         void shouldReturnUserResponse_whenSuccess() {
-            RoleName roleName = VIEWER;
-            CreateUserRequest request = CreateUserRequest.builder()
-                .email("john.doe@email.com")
-                .password("secret")
-                .firstName("John")
-                .lastName("Doe")
-                .roles(Set.of(roleName))
-                .build();
-
-            Role role = Role.builder().name(VIEWER).build();
-            User user = User.builder().email(request.email()).roles(new HashSet<>()).build();
-            UserResponse response = UserResponse.builder()
-                .id(user.getId())
-                .email(request.email())
-                .build();
+            // Arrange
+            CreateUserCommand request = createAdminUserCommandBuilder().build();
+            User user = adminUserBuilder().build();
+            UserResponse response = adminUserResponseBuilder().build();
 
             when(userRepository.existsByEmail(request.email())).thenReturn(false);
-            when(userMapper.toEntity(request)).thenReturn(user);
+            when(userDomainMapper.commandToEntity(request)).thenReturn(user);
             when(passwordEncoder.encode(request.password())).thenReturn("encoded_secret");
-            when(roleService.findByNameOrThrow(roleName)).thenReturn(role);
+            when(roleService.findByNameOrThrow(any(RoleName.class)))
+                .thenReturn(Role.builder().name(SUPER_ADMIN).build());
             when(userRepository.save(user)).thenReturn(user);
-            when(userMapper.toResponse(user)).thenReturn(response);
+            when(userDomainMapper.entityToResponse(user)).thenReturn(response);
 
+            // Act
             UserResponse result = userService.create(request);
 
+            // Assert
             assertThat(result.email()).isEqualTo(request.email());
-            assertThat(result.id()).isEqualTo(user.getId());
-            verify(roleService).findByNameOrThrow(roleName);
-            verify(passwordEncoder).encode("secret");
+            verify(roleService).findByNameOrThrow(any());
+            verify(passwordEncoder).encode(request.password());
             verify(userRepository).save(user);
         }
 
         @Test
-        @DisplayName("Lève EmailAlreadyExistsException quand l'email est déjà utilisé")
+        @DisplayName("Erreur EmailAlreadyExistsException quand l'email est déjà utilisé")
         void shouldThrowEmailAlreadyExistsException_whenEmailTaken() {
-            CreateUserRequest request = CreateUserRequest.builder()
-                .email("john.doe@email.com")
-                .password("secret")
-                .firstName("John")
-                .lastName("Doe")
-                .roles(Set.of(VIEWER))
-                .build();
+            // Arrange
+            CreateUserCommand request = createAdminUserCommandBuilder().build();
 
             when(userRepository.existsByEmail(request.email())).thenReturn(true);
 
+            // Act & Assert
             assertThatThrownBy(() -> userService.create(request))
                 .isInstanceOf(UserExceptions.EmailAlreadyExistsException.class)
                 .hasMessageContaining(request.email());
         }
 
         @Test
-        @DisplayName("Lève ResourceNotFoundException quand le rôle n'existe pas en base")
+        @DisplayName("Erreur ResourceNotFoundException quand le rôle n'existe pas en base")
         void shouldThrowResourceNotFoundException_whenRoleDoesNotExist() {
-            CreateUserRequest request = CreateUserRequest.builder()
-                .email("john.doe@email.com")
-                .password("secret")
-                .firstName("John")
-                .lastName("Doe")
-                .roles(Set.of(CFO))
-                .build();
-
-            User user = User.builder().email(request.email()).roles(new HashSet<>()).build();
+            // Arrange
+            CreateUserCommand request = createAdminUserCommandBuilder().build();
+            User user = adminUserBuilder().build();
 
             when(userRepository.existsByEmail(request.email())).thenReturn(false);
-            when(userMapper.toEntity(request)).thenReturn(user);
-            when(passwordEncoder.encode(any())).thenReturn("encoded");
-            when(roleService.findByNameOrThrow(CFO))
-                .thenThrow(new ResourceNotFoundException(Role.class.getSimpleName(), CFO.name()));
+            when(userDomainMapper.commandToEntity(request)).thenReturn(user);
+            when(passwordEncoder.encode(request.password())).thenReturn("encoded_secret");
+            when(roleService.findByNameOrThrow(SUPER_ADMIN))
+                .thenThrow(new ResourceNotFoundException(Role.class.getSimpleName(), SUPER_ADMIN.name()));
 
+            // Act & Assert
             assertThatThrownBy(() -> userService.create(request))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("CFO");
+                .hasMessageContaining("SUPER_ADMIN");
         }
     }
 }

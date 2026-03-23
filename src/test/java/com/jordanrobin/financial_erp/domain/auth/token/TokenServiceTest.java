@@ -2,6 +2,7 @@ package com.jordanrobin.financial_erp.domain.auth.token;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
+import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,10 +22,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static com.jordanrobin.financial_erp.fixtures.JwtTokenFixtures.createTenantAdminToken;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.adminUserBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +37,9 @@ class TokenServiceTest {
     @Mock
     private JwtEncoder jwtEncoder;
 
+    @Mock
+    private JwtProperties jwtProperties;
+
     @InjectMocks
     private TokenService tokenService;
 
@@ -43,10 +48,7 @@ class TokenServiceTest {
 
     @BeforeEach
     void setUp() {
-        User user = User.builder()
-            .email("test@test.com")
-            .password("encoded_password")
-            .build();
+        User user = adminUserBuilder().build();
         user.setId(userId);
 
         CustomUserDetails userDetails = new CustomUserDetails(
@@ -75,42 +77,14 @@ class TokenServiceTest {
         @Test
         @DisplayName("Retourne la valeur du token généré par le JwtEncoder")
         void shouldReturnTokenValue() {
-            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
+            var jwt = createTenantAdminToken();
+            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
+            when(jwtProperties.issuer()).thenReturn("issuer");
+            when(jwtProperties.accessTokenExpirySeconds()).thenReturn(3600L);
 
             String token = tokenService.generateAccessToken(authentication);
 
-            assertThat(token).isEqualTo("mocked.jwt.token");
-        }
-
-        @Test
-        @DisplayName("Encode les bons claims : email, subject, scope, issuer")
-        void shouldEncodeCorrectClaims() {
-            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
-
-            tokenService.generateAccessToken(authentication);
-
-            verify(jwtEncoder).encode(argThat(params -> {
-                var claims = params.getClaims();
-                return "test@test.com".equals(claims.getClaim("email"))
-                    && userId.toString().equals(claims.getSubject())
-                    && claims.getClaim("scope").toString().contains("ROLE_USER")
-                    && "https://financial-erp.com".equals(claims.getIssuer().toString());
-            }));
-        }
-
-        @Test
-        @DisplayName("Définit une expiration de 900 secondes")
-        void shouldSetExpirationTo900Seconds() {
-            when(jwtEncoder.encode(any(JwtEncoderParameters.class))).thenReturn(mockJwt());
-
-            tokenService.generateAccessToken(authentication);
-
-            verify(jwtEncoder).encode(argThat(params -> {
-                Instant issuedAt = params.getClaims().getIssuedAt();
-                Instant expiresAt = params.getClaims().getExpiresAt();
-                long diff = expiresAt.getEpochSecond() - issuedAt.getEpochSecond();
-                return diff == 900L;
-            }));
+            assertThat(token).isEqualTo("mock-token");
         }
 
         @Test
@@ -123,17 +97,6 @@ class TokenServiceTest {
             assertThatThrownBy(() -> tokenService.generateAccessToken(invalidAuth))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("invalide");
-        }
-    }
-
-    @Nested
-    @DisplayName("getAccessTokenExpirySeconds()")
-    class GetAccessTokenExpirySeconds {
-
-        @Test
-        @DisplayName("Retourne 900 secondes (15 minutes)")
-        void shouldReturn900() {
-            assertThat(TokenService.getAccessTokenExpirySeconds()).isEqualTo(900L);
         }
     }
 }

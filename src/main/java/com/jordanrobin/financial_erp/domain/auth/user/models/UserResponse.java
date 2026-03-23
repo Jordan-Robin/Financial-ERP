@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.api.user.dtos;
+package com.jordanrobin.financial_erp.domain.auth.user.models;
 
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import lombok.Builder;

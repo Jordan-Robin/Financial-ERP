@@ -1,6 +1,7 @@
 package com.jordanrobin.financial_erp.domain.auth.token;
 
 import com.jordanrobin.financial_erp.domain.auth.user.User;
+import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
 import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import static com.jordanrobin.financial_erp.fixtures.JwtTokenFixtures.createRefreshToken;
+import static com.jordanrobin.financial_erp.fixtures.UserFixtures.adminUserBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,6 +32,9 @@ class RefreshTokenServiceTest {
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
 
+    @Mock
+    private JwtProperties jwtProperties;
+
     @InjectMocks
     private RefreshTokenService refreshTokenService;
 
@@ -37,16 +43,8 @@ class RefreshTokenServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-            .email("test@test.com")
-            .build();
-
-        validToken = RefreshToken.builder()
-            .token("valid-token")
-            .user(user)
-            .revoked(false)
-            .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
-            .build();
+        user = adminUserBuilder().build();
+        validToken = createRefreshToken().build();
     }
 
     @Nested
@@ -54,10 +52,11 @@ class RefreshTokenServiceTest {
     class Create {
 
         @Test
-        @DisplayName("Sauvegarde un token avec les bonnes propriétés")
+        @DisplayName("Succès : sauvegarde un token")
         void shouldSaveRefreshTokenWithCorrectProperties() {
             when(refreshTokenRepository.save(any(RefreshToken.class)))
                 .thenAnswer(i -> i.getArgument(0));
+            when(jwtProperties.refreshTokenExpirySeconds()).thenReturn(604800L);
 
             refreshTokenService.create(user);
 

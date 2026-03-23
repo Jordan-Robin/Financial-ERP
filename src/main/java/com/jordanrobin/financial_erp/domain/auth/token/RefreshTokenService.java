@@ -1,6 +1,7 @@
 package com.jordanrobin.financial_erp.domain.auth.token;
 
 import com.jordanrobin.financial_erp.domain.auth.user.User;
+import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
 import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
     @Transactional
     public RefreshToken create(User user) {
@@ -22,7 +24,7 @@ public class RefreshTokenService {
             RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(user)
-                .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
+                .expiresAt(Instant.now().plus(jwtProperties.refreshTokenExpirySeconds(), ChronoUnit.SECONDS))
                 .build()
         );
     }

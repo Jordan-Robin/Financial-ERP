@@ -1,10 +1,9 @@
 package com.jordanrobin.financial_erp.domain.auth;
 
-import com.jordanrobin.financial_erp.api.auth.dtos.AuthResponse;
-import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
 import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
 import com.jordanrobin.financial_erp.domain.auth.token.RefreshTokenService;
 import com.jordanrobin.financial_erp.domain.auth.token.TokenService;
+import com.jordanrobin.financial_erp.domain.auth.token.model.TokenPair;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
@@ -22,9 +21,9 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final CustomUserDetailsService customUserDetailsService;
 
-    public AuthResponse login(LoginRequest request) {
+    public TokenPair login(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            new UsernamePasswordAuthenticationToken(email, password)
         );
 
         if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
@@ -33,15 +32,10 @@ public class AuthService {
         String accessToken = tokenService.generateAccessToken(authentication);
         String refreshToken = refreshTokenService.create(userDetails.getUser()).getToken();
 
-        return new AuthResponse(
-            accessToken,
-            refreshToken,
-            "Bearer",
-            TokenService.getAccessTokenExpirySeconds()
-        );
+        return TokenPair.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
-    public AuthResponse refresh(String refreshToken) {
+    public TokenPair refresh(String refreshToken) {
         // TODO implémenter mesures de sécurité en cas de vol du refresh token
         RefreshToken validToken = refreshTokenService.validateAndRotate(refreshToken);
         User user = validToken.getUser();
@@ -58,12 +52,7 @@ public class AuthService {
         String newAccessToken = tokenService.generateAccessToken(authentication);
         String newRefreshToken = refreshTokenService.create(user).getToken();
 
-        return new AuthResponse(
-            newAccessToken,
-            newRefreshToken,
-            "Bearer",
-            TokenService.getAccessTokenExpirySeconds()
-        );
+        return TokenPair.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
     }
 
     public void logout(String refreshToken) {
