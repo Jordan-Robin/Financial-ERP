@@ -1,8 +1,8 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
 import com.jordanrobin.financial_erp.domain.BaseEntity;
+import com.jordanrobin.financial_erp.domain.tenant.Tenant;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.MonthDay;
@@ -16,9 +16,12 @@ import java.time.MonthDay;
 @Table(name = "organizations")
 public class Organization extends BaseEntity {
 
-    @NotBlank
     @Column(nullable = false, length = 100)
     private String name;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id", nullable = false, unique = true)
+    private Tenant tenant;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)

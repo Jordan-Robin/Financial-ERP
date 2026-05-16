@@ -1,0 +1,18 @@
+INSERT INTO public.users (id,
+                          email,
+                          password_hash,
+                          status,
+                          is_super_admin,
+                          created_at,
+                          updated_at,
+                          created_by,
+                          last_modified_by)
+VALUES (gen_random_uuid(),
+        '${SUPER_USER_EMAIL}',
+        '${SUPER_USER_PASSWORD}',
+        'ACTIVE',
+        true,
+        now(),
+        now(),
+        null,
+        null);

@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "Spring")
 public interface UserDomainMapper {
 
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     User commandToEntity(CreateUserCommand createUserCommand);
 
     UserResponse entityToResponse(User user);

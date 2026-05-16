@@ -11,7 +11,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
-    enabled: false
+    enabled: true
+    schemas: public
+    locations: classpath:db/migration/public
+    table: flyway_schema_history
+    validate-on-migrate: true
+    out-of-order: false
+    create-schemas: false
 
 app:
   security:
