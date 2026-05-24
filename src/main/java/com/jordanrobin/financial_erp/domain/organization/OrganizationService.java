@@ -1,10 +1,10 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
-import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
 import com.jordanrobin.financial_erp.domain.organization.mappers.OrganizationDomainMapper;
-import com.jordanrobin.financial_erp.domain.organization.models.CreateOrganizationCommand;
-import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceAlreadyExistsException;
-import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
+import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ public class OrganizationService {
     public OrganizationResponse getById(UUID id) {
         return organizationRepository.findById(id)
             .map(organizationDomainMapper::entityToResponse)
-            .orElseThrow(() -> new ResourceNotFoundException(Organization.class.getSimpleName(), id.toString()));
+            .orElseThrow(() -> new ResourceNotFoundException(Organization.class.getSimpleName(), "id", id.toString()));
     }
 
 }

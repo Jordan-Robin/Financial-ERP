@@ -3,7 +3,7 @@ package com.jordanrobin.financial_erp.fixtures;
 import com.jordanrobin.financial_erp.api.auth.dtos.AuthResponse;
 import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
 import com.jordanrobin.financial_erp.api.auth.dtos.RefreshRequest;
-import com.jordanrobin.financial_erp.domain.auth.token.model.TokenPair;
+import com.jordanrobin.financial_erp.domain.auth.jwt.dtos.TokenPair;
 
 public class AuthenticationFixtures {
 

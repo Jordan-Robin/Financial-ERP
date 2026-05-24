@@ -37,7 +37,7 @@ class CustomUserDetailsServiceTest {
         String email = "user@test.com";
         Privilege p1 = Privilege.builder().name(PRIVILEGE_READ).build();
         Privilege p2 = Privilege.builder().name(USER_READ).build();
-        Role role = Role.builder().name(TENANT_ADMIN).privileges(Set.of(p1, p2)).build();
+        Role role = Role.builder().name(TENANT_SUPER_ADMIN).privileges(Set.of(p1, p2)).build();
 
         User user = User.builder()
             .email(email)

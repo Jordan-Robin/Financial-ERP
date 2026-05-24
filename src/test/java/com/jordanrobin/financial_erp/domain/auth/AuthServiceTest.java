@@ -1,13 +1,12 @@
 package com.jordanrobin.financial_erp.domain.auth;
 
-import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
-import com.jordanrobin.financial_erp.domain.auth.token.RefreshTokenService;
-import com.jordanrobin.financial_erp.domain.auth.token.TokenService;
-import com.jordanrobin.financial_erp.domain.auth.token.model.TokenPair;
+import com.jordanrobin.financial_erp.domain.auth.jwt.RefreshToken;
+import com.jordanrobin.financial_erp.domain.auth.jwt.RefreshTokenService;
+import com.jordanrobin.financial_erp.domain.auth.jwt.AccessTokenService;
+import com.jordanrobin.financial_erp.domain.auth.jwt.dtos.TokenPair;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
-import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +29,6 @@ import static com.jordanrobin.financial_erp.fixtures.UserFixtures.adminUserBuild
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +40,7 @@ class AuthServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
-    private TokenService tokenService;
+    private AccessTokenService tokenService;
     @Mock
     private RefreshTokenService refreshTokenService;
     @Mock

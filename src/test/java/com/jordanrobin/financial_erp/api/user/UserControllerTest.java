@@ -1,13 +1,11 @@
 package com.jordanrobin.financial_erp.api.user;
 
-import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapper;
 import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapperImpl;
 import com.jordanrobin.financial_erp.base.BaseControllerTest;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.domain.auth.user.UserService;
-import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateUserCommand;
 import com.jordanrobin.financial_erp.infrastructure.security.SecurityConfig;
-import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

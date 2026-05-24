@@ -6,8 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum RoleName {
-    SUPER_ADMIN("Accès total cross-tenant"),
-    TENANT_ADMIN("Gestion complète du tenant"),
+    TENANT_SUPER_ADMIN("Gestion complète du tenant"),
     ACCOUNTANT("Comptabilité lecture/écriture"),
     ACCOUNTANT_SENIOR("Comptabilité + approbation"),
     CFO("Lecture globale + exports financiers"),

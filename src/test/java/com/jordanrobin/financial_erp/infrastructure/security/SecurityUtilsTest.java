@@ -2,7 +2,6 @@ package com.jordanrobin.financial_erp.infrastructure.security;
 
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
-import com.jordanrobin.financial_erp.shared.exception.api.SecurityExceptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +59,7 @@ class SecurityUtilsTest {
             mockedHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
 
             assertThatThrownBy(securityUtils::getCurrentUser)
-                .isInstanceOf(SecurityExceptions.UnauthorizedException.class)
+                .isInstanceOf(ApiExceptions.UnauthorizedException.class)
                 .hasMessage("No authenticated user found.");
         }
     }
@@ -78,7 +77,7 @@ class SecurityUtilsTest {
             mockedHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
 
             assertThatThrownBy(securityUtils::getCurrentUser)
-                .isInstanceOf(SecurityExceptions.UnauthorizedException.class)
+                .isInstanceOf(ApiExceptions.UnauthorizedException.class)
                 .hasMessage("No authenticated user found.");
         }
     }

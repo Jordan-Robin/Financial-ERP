@@ -2,8 +2,8 @@ package com.jordanrobin.financial_erp.fixtures;
 
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
 import com.jordanrobin.financial_erp.domain.organization.Organization;
-import com.jordanrobin.financial_erp.domain.organization.models.CreateOrganizationCommand;
-import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
 import com.jordanrobin.financial_erp.domain.organization.LegalStatus;
 
 import java.time.MonthDay;

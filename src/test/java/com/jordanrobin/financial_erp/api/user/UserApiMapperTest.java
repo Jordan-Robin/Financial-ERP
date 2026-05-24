@@ -2,7 +2,7 @@ package com.jordanrobin.financial_erp.api.user;
 
 import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
 import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapper;
-import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateUserCommand;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class UserApiMapperTest {
             .password("secret123")
             .firstName("Clément")
             .lastName("Dupont")
-            .roles(Set.of(RoleName.TENANT_ADMIN))
+            .roles(Set.of(RoleName.TENANT_SUPER_ADMIN))
             .build();
 
         CreateUserCommand command = mapper.dtoToCommand(request);
@@ -34,6 +34,6 @@ class UserApiMapperTest {
         assertThat(command.password()).isEqualTo(request.password());
         assertThat(command.firstName()).isEqualTo(request.firstName());
         assertThat(command.lastName()).isEqualTo(request.lastName());
-        assertThat(command.roles()).containsExactly(RoleName.TENANT_ADMIN);
+        assertThat(command.roles()).containsExactly(RoleName.TENANT_SUPER_ADMIN);
     }
 }

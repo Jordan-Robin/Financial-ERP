@@ -7,7 +7,6 @@ import com.jordanrobin.financial_erp.domain.auth.AuthService;
 import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetailsService;
 import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
 import com.jordanrobin.financial_erp.infrastructure.security.SecurityConfig;
-import com.jordanrobin.financial_erp.shared.exception.domain.AuthExceptions.InvalidRefreshTokenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

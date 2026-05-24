@@ -1,7 +1,7 @@
 package com.jordanrobin.financial_erp.api.organization.mappers;
 
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
-import com.jordanrobin.financial_erp.domain.organization.models.CreateOrganizationCommand;
+import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

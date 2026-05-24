@@ -1,27 +1,32 @@
-//package com.jordanrobin.financial_erp.api.auth;
-//
-//import com.jordanrobin.financial_erp.api.auth.dtos.AuthResponse;
-//import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
-//import com.jordanrobin.financial_erp.api.auth.dtos.RefreshRequest;
-//import com.jordanrobin.financial_erp.api.auth.mappers.AuthApiMapper;
-//import com.jordanrobin.financial_erp.domain.auth.AuthService;
-//import com.jordanrobin.financial_erp.domain.auth.token.model.TokenPair;
-//import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
-//import io.swagger.v3.oas.annotations.Operation;
-//import io.swagger.v3.oas.annotations.responses.ApiResponse;
-//import io.swagger.v3.oas.annotations.tags.Tag;
-//import jakarta.validation.Valid;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//@Tag(name = "Authentication", description = "Gestion de l'authentification JWT")
-//@RestController
-//@RequestMapping("/api/auth")
-//@RequiredArgsConstructor
-//public class AuthController {
-//
-//    private final AuthService authService;
+package com.jordanrobin.financial_erp.api.auth;
+
+import com.jordanrobin.financial_erp.api.auth.dtos.CreatePasswordRequest;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreatePasswordCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.mappers.PasswordMapper;
+import com.jordanrobin.financial_erp.shared.constants.ApiRoutes;
+import com.jordanrobin.financial_erp.api.auth.dtos.AuthResponse;
+import com.jordanrobin.financial_erp.api.auth.dtos.LoginRequest;
+import com.jordanrobin.financial_erp.api.auth.dtos.RefreshRequest;
+import com.jordanrobin.financial_erp.api.auth.mappers.AuthApiMapper;
+import com.jordanrobin.financial_erp.domain.auth.AuthService;
+import com.jordanrobin.financial_erp.domain.auth.jwt.dtos.TokenPair;
+import com.jordanrobin.financial_erp.infrastructure.security.JwtProperties;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "Authentication", description = "Gestion de l'authentification JWT")
+@RestController
+@RequestMapping(ApiRoutes.API_V1 + "/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+    private final PasswordMapper passwordMapper;
 //    private final JwtProperties jwtProperties;
 //    private final AuthApiMapper authApiMapper;
 //
@@ -56,4 +61,10 @@
 //        authService.logout(request.refreshToken());
 //        return ResponseEntity.noContent().build();
 //    }
-//}
+//
+    @PostMapping("/set-password")
+    public ResponseEntity<Void> setPassword(@RequestBody @Valid CreatePasswordRequest request) {
+        authService.setPassword(passwordMapper.requestToCommand(request));
+        return ResponseEntity.noContent().build();
+    }
+}

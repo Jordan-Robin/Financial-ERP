@@ -1,6 +1,6 @@
 package com.jordanrobin.financial_erp.fixtures;
 
-import com.jordanrobin.financial_erp.domain.auth.token.RefreshToken;
+import com.jordanrobin.financial_erp.domain.auth.jwt.RefreshToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;

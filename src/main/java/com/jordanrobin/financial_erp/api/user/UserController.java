@@ -1,8 +1,9 @@
 //package com.jordanrobin.financial_erp.api.user;
 //
-//import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
+//import com.jordanrobin.financial_erp.api.user.dtos.CreateSuperUserRequest;
 //import com.jordanrobin.financial_erp.api.user.mappers.UserApiMapper;
-//import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
+//import com.jordanrobin.financial_erp.domain.auth.user.dtos.SuperUserResult;
+//import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserResponse;
 //import com.jordanrobin.financial_erp.domain.auth.user.UserService;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +19,7 @@
 //@Tag(name = "Users", description = "Gestion des utilisateurs")
 //@RestController
 //@RequiredArgsConstructor
-//@RequestMapping("/api/users")
+//@RequestMapping("/api/users") // TODO utiliser constante
 //public class UserController {
 //
 //    private final UserService userService;

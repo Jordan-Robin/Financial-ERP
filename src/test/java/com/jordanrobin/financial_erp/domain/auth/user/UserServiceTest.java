@@ -1,13 +1,12 @@
 package com.jordanrobin.financial_erp.domain.auth.user;
 
 import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
-import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
-import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
-import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
-import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.*;
 import static com.jordanrobin.financial_erp.fixtures.UserFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

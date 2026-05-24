@@ -1,44 +1,72 @@
-//package com.jordanrobin.financial_erp.domain.auth.user;
-//
-//import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
-//import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
-//import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
-//import com.jordanrobin.financial_erp.domain.auth.role.Role;
-//import com.jordanrobin.financial_erp.domain.auth.role.RoleService;
-//import com.jordanrobin.financial_erp.shared.exception.domain.UserExceptions;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.Set;
-//import java.util.UUID;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@RequiredArgsConstructor
-//@Transactional
-//public class UserService {
-//
-//    private final UserRepository userRepository;
-//    private final UserDomainMapper userDomainMapper;
+package com.jordanrobin.financial_erp.domain.auth.user;
+
+import com.jordanrobin.financial_erp.domain.auth.invitationtoken.InvitationTokenService;
+import com.jordanrobin.financial_erp.domain.auth.invitationtoken.dtos.CreateTokenResult;
+import com.jordanrobin.financial_erp.domain.auth.user.mappers.SuperUserDomainMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateSuperUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.SuperUserResult;
+import com.jordanrobin.financial_erp.infrastructure.messaging.EmailService;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final UserDomainMapper userDomainMapper;
+    private final SuperUserDomainMapper superUserDomainMapper;
+    private final InvitationTokenService invitationTokenService;
+    private final EmailService emailService;
 //    private final PasswordEncoder passwordEncoder;
 //    private final RoleService roleService;
 //
-//    @Transactional(readOnly = true)
 //    public UserResponse getByEmail(String email) {
 //        return userRepository.findByEmail(email)
 //            .map(userDomainMapper::entityToResponse)
 //            .orElseThrow(() -> new UserExceptions.UserNotFoundException(email));
 //    }
 //
-//    @Transactional(readOnly = true)
 //    public UserResponse getById(UUID id) {
 //        return userRepository.findById(id)
 //            .map(userDomainMapper::entityToResponse)
 //            .orElseThrow(() -> new UserExceptions.UserNotFoundException(id.toString()));
 //    }
-//
+
+    @Transactional
+    public SuperUserResult createSuperUser(CreateSuperUserCommand command) {
+        if (userRepository.existsByEmail(command.email())) {
+            throw new ResourceAlreadyExistsException(User.class.getSimpleName(), "email", command.email());
+        }
+
+        User user = superUserDomainMapper.commandToEntity(command);
+        user.setStatus(UserStatus.PENDING);
+        user.setSuperAdmin(true);
+        User userSaved = userRepository.save(user);
+
+        CreateTokenResult createTokenResult = invitationTokenService.createToken(userSaved);
+
+        emailService.sendInvitation(userSaved.getEmail(), createTokenResult.rawToken());
+
+        return SuperUserResult.builder()
+            .id(userSaved.getId())
+            .email(userSaved.getEmail())
+            .status(userSaved.getStatus())
+            .build();
+    }
+
+    @Transactional
+    public void activate(User user, String hashedPassword) {
+        user.setStatus(UserStatus.ACTIVE);
+        user.setPasswordHash(hashedPassword);
+        userRepository.save(user);
+    }
+
+//    @Transactional
 //    public UserResponse create(CreateUserCommand request) {
 //        if (userRepository.existsByEmail(request.email())) {
 //            throw new UserExceptions.EmailAlreadyExistsException(request.email());
@@ -53,5 +81,4 @@
 //
 //        return userDomainMapper.entityToResponse(userRepository.save(user));
 //    }
-//
-//}
+}

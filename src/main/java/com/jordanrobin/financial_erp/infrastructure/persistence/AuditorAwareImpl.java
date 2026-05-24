@@ -1,6 +1,6 @@
 package com.jordanrobin.financial_erp.infrastructure.persistence;
 
-import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
+//import com.jordanrobin.financial_erp.domain.auth.user.CustomUserDetails;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
@@ -22,8 +22,9 @@ public class AuditorAwareImpl implements AuditorAware<UUID> {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(authentication.getPrincipal())
-            .filter(p -> p instanceof CustomUserDetails)
-            .map(p -> ((CustomUserDetails) p).getUser().getId());
+//        return Optional.ofNullable(authentication.getPrincipal())
+//            .filter(p -> p instanceof CustomUserDetails)
+//            .map(p -> ((CustomUserDetails) p).getUser().getId());
+                return Optional.of(UUID.randomUUID());
     }
 }

@@ -1,7 +1,7 @@
 package com.jordanrobin.financial_erp.api.user.mappers;
 
 import com.jordanrobin.financial_erp.api.user.dtos.CreateUserRequest;
-import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateUserCommand;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

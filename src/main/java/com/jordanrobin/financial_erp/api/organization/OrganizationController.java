@@ -1,7 +1,7 @@
 package com.jordanrobin.financial_erp.api.organization;
 
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
-import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
 import com.jordanrobin.financial_erp.api.organization.mappers.OrganizationApiMapper;
 import com.jordanrobin.financial_erp.domain.organization.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;

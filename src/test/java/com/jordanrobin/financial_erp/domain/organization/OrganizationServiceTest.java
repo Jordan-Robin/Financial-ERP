@@ -1,9 +1,9 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
 import com.jordanrobin.financial_erp.domain.organization.mappers.OrganizationDomainMapper;
-import com.jordanrobin.financial_erp.domain.organization.models.OrganizationResponse;
-import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceAlreadyExistsException;
-import com.jordanrobin.financial_erp.shared.exception.domain.resources.ResourceNotFoundException;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

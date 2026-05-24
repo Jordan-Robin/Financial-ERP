@@ -21,7 +21,7 @@ import static com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName.
 import static com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName.ROLE_READ;
 import static com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName.USER_MANAGE;
 import static com.jordanrobin.financial_erp.domain.auth.privilege.PrivilegeName.USER_READ;
-import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.TENANT_ADMIN;
+import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.TENANT_SUPER_ADMIN;
 import static com.jordanrobin.financial_erp.domain.auth.role.RoleName.VIEWER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,13 +49,13 @@ class RolePrivilegeInitializerTest {
         void shouldNotSave_whenPrivilegesUnchanged() {
             Privilege p = Privilege.builder().name(USER_READ).build();
             Role existingRole = Role.builder()
-                .name(TENANT_ADMIN)
+                .name(TENANT_SUPER_ADMIN)
                 .privileges(new HashSet<>(Set.of(p)))
                 .build();
 
-            given(roleService.findByName(TENANT_ADMIN)).willReturn(Optional.of(existingRole));
+            given(roleService.findByName(TENANT_SUPER_ADMIN)).willReturn(Optional.of(existingRole));
 
-            initializer.upsertRole(TENANT_ADMIN, new HashSet<>(Set.of(p)));
+            initializer.upsertRole(TENANT_SUPER_ADMIN, new HashSet<>(Set.of(p)));
 
             verify(roleService, never()).save(any());
         }

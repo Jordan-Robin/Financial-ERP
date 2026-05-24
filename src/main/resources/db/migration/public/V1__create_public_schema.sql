@@ -60,3 +60,19 @@ CREATE UNIQUE INDEX idx_refresh_tokens_active
     ON public.refresh_tokens (user_id, tenant_id) WHERE revoked_at IS NULL;
 CREATE INDEX idx_refresh_tokens_user_id ON public.refresh_tokens (user_id);
 CREATE INDEX idx_refresh_tokens_tenant_id ON public.refresh_tokens (tenant_id);
+
+-- Table Invitation Tokens
+CREATE TABLE public.invitation_tokens
+(
+    id               UUID         NOT NULL,
+    user_id          UUID         NOT NULL REFERENCES public.users (id),
+    token_hash       VARCHAR(255) NOT NULL,
+    expires_at       TIMESTAMPTZ  NOT NULL,
+    used_at          TIMESTAMPTZ,
+    created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ  NOT NULL,
+    created_by       UUID,
+    last_modified_by UUID,
+    PRIMARY KEY (id)
+);
+CREATE INDEX idx_invitation_tokens_user_id ON public.invitation_tokens (user_id);

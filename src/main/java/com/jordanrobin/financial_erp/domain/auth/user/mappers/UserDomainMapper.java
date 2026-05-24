@@ -3,8 +3,8 @@ package com.jordanrobin.financial_erp.domain.auth.user.mappers;
 import com.jordanrobin.financial_erp.domain.auth.role.Role;
 import com.jordanrobin.financial_erp.domain.auth.role.RoleName;
 import com.jordanrobin.financial_erp.domain.auth.user.User;
-import com.jordanrobin.financial_erp.domain.auth.user.models.CreateUserCommand;
-import com.jordanrobin.financial_erp.domain.auth.user.models.UserResponse;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateUserCommand;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
