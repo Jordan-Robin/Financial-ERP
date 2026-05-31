@@ -7,7 +7,5 @@ import java.util.UUID;
 
 public interface OrganizationRepository extends JpaRepository<Organization, UUID> {
 
-    Optional<Organization> findBySiren(String siren);
-
     boolean existsBySiren(String siren);
 }

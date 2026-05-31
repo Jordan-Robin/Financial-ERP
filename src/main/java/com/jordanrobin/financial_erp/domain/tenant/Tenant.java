@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-@ToString(of = {"slug"})
+@ToString(of = {"tenantSlug"})
 @Builder
 @Entity
 @Table(name = "tenants", schema = "public")

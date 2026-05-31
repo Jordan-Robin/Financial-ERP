@@ -4,10 +4,6 @@ CREATE TABLE privileges
     id               UUID        NOT NULL,
     name             VARCHAR(50) NOT NULL,
     description      VARCHAR(255),
-    created_at       TIMESTAMPTZ NOT NULL,
-    updated_at       TIMESTAMPTZ NOT NULL,
-    created_by       UUID,
-    last_modified_by UUID,
     PRIMARY KEY (id),
     CONSTRAINT uk_privilege_name UNIQUE (name)
 );

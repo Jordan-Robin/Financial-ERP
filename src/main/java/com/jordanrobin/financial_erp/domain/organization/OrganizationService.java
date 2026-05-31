@@ -13,21 +13,21 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final OrganizationDomainMapper organizationDomainMapper;
 
-    public OrganizationResponse create(CreateOrganizationCommand request) {
-        if (request.siren() != null && organizationRepository.existsBySiren(request.siren())) {
-            throw new ResourceAlreadyExistsException(Organization.class.getSimpleName(), "siren", request.siren());
+    @Transactional
+    public OrganizationResponse create(CreateOrganizationCommand command) {
+        if (command.siren() != null && organizationRepository.existsBySiren(command.siren())) {
+            throw new ResourceAlreadyExistsException(Organization.class.getSimpleName(), "siren", command.siren());
         }
-        Organization organization = organizationDomainMapper.commandToEntity(request);
+        Organization organization = organizationDomainMapper.commandToEntity(command);
         return organizationDomainMapper.entityToResponse(organizationRepository.save(organization));
     }
 
-    @Transactional(readOnly = true)
     public OrganizationResponse getById(UUID id) {
         return organizationRepository.findById(id)
             .map(organizationDomainMapper::entityToResponse)

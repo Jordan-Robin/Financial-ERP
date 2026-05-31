@@ -1,11 +1,11 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
 import com.jordanrobin.financial_erp.domain.BaseEntity;
-import com.jordanrobin.financial_erp.domain.tenant.Tenant;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.MonthDay;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,9 +19,8 @@ public class Organization extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id", nullable = false, unique = true)
-    private Tenant tenant;
+    @Column(nullable = false)
+    private UUID tenantId;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
@@ -35,5 +34,4 @@ public class Organization extends BaseEntity {
 
     @Column
     private MonthDay fiscalYearEndDate;
-
 }

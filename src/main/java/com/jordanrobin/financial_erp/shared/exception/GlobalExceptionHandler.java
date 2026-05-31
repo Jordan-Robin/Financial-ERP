@@ -1,6 +1,7 @@
 package com.jordanrobin.financial_erp.shared.exception;
 
 import com.jordanrobin.financial_erp.shared.exception.auth.InvalidInvitationTokenException;
+import com.jordanrobin.financial_erp.shared.exception.auth.InvalidSchemaNameException;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         return ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InvalidSchemaNameException.class)
+    public ProblemDetail handleInvalidSchemaName(InvalidSchemaNameException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setProperty("suggestion", InvalidSchemaNameException.SUGGESTION);
+        return problemDetail;
     }
 
     @Override

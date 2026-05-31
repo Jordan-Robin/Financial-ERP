@@ -95,6 +95,36 @@ public class SecurityConfig {
 //        return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
 //    }
 
+//    @Bean
+//    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        // Étape 1 : lire les rôles depuis le token
+//        JwtGrantedAuthoritiesConverter rolesConverter = new JwtGrantedAuthoritiesConverter();
+//        rolesConverter.setAuthoritiesClaimName("roles");
+//        rolesConverter.setAuthorityPrefix("");  // pas de préfixe ROLE_
+//
+//        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+//        // Étape 2 : enrichir avec les privileges chargés depuis la base
+//        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+//            // Rôles depuis le token
+//            Collection<GrantedAuthority> roles = rolesConverter.convert(jwt);
+//            // Privileges depuis la base (à implémenter)
+//            // String schemaName = jwt.getClaim("schema_name");
+//            // TenantContext.setCurrentSchema(schemaName);
+//            // Collection<GrantedAuthority> privileges = privilegeService.loadByRoles(roles);
+//            // TenantContext.clear();
+//            return roles; // pour l'instant, retourne juste les rôles
+//        });
+//        return converter;
+//    }
+    // puis dans filterchain :
+//    .oauth2ResourceServer(oauth2 -> oauth2
+//        .jwt(jwt -> jwt
+//        .decoder(jwtDecoder())
+//        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+//        )
+//        )
+    // VOIR DANS NOTES
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

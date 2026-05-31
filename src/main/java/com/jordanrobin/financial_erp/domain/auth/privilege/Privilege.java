@@ -1,8 +1,10 @@
 package com.jordanrobin.financial_erp.domain.auth.privilege;
 
-import com.jordanrobin.financial_erp.domain.BaseEntity;
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +14,11 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "privileges")
-public class Privilege extends BaseEntity {
+public class Privilege {
+
+    @Id
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id = UuidCreator.getTimeOrderedEpoch();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true, length = 50)
