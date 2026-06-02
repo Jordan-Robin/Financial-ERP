@@ -3,7 +3,7 @@ package com.jordanrobin.financial_erp.fixtures;
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
 import com.jordanrobin.financial_erp.domain.organization.Organization;
 import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
-import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
 import com.jordanrobin.financial_erp.domain.organization.LegalStatus;
 
 import java.time.MonthDay;
@@ -38,8 +38,8 @@ public class OrganizationFixtures {
             .fiscalYearEndDate(MonthDay.of(12, 31));
     }
 
-    public static OrganizationResponse.OrganizationResponseBuilder organizationResponseBuilder() {
-        return OrganizationResponse.builder()
+    public static OrganizationOutput.OrganizationResponseBuilder organizationResponseBuilder() {
+        return OrganizationOutput.builder()
             .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
             .name("Organization")
             .legalStatus(LegalStatus.SA)

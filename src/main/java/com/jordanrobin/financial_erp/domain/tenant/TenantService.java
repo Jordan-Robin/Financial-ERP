@@ -2,7 +2,9 @@ package com.jordanrobin.financial_erp.domain.tenant;
 
 import com.jordanrobin.financial_erp.domain.organization.OrganizationService;
 import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
 import com.jordanrobin.financial_erp.domain.tenant.dtos.CreateTenantCommand;
+import com.jordanrobin.financial_erp.domain.tenant.dtos.CreateTenantOutput;
 import com.jordanrobin.financial_erp.infrastructure.persistence.flyway.TenantFlywayMigrator;
 import com.jordanrobin.financial_erp.infrastructure.persistence.tenant.TenantContext;
 import com.jordanrobin.financial_erp.shared.exception.auth.InvalidSchemaNameException;
@@ -17,7 +19,8 @@ public class TenantService {
     private final TenantRepository tenantRepository;
     private final OrganizationService organizationService;
 
-    public void createTenant(CreateTenantCommand tenantCommand) {
+    // TODO gestion du cas d'échec partiel (vérification que tenant pas déjà créé au autre solution)
+    public CreateTenantOutput createTenant(CreateTenantCommand tenantCommand) {
         if (!tenantCommand.tenantSlug().matches("^[a-z0-9_]+$")) {
             throw new InvalidSchemaNameException(tenantCommand.tenantSlug());
         }
@@ -41,7 +44,14 @@ public class TenantService {
                 .name(tenantCommand.organizationName())
                 .tenantId(tenant.getId())
                 .build();
-            organizationService.create(organizationCommand);
+            OrganizationOutput organizationOutput = organizationService.create(organizationCommand);
+
+            return CreateTenantOutput.builder()
+                .tenantId(tenant.getId())
+                .slug(tenant.getSlug())
+                .schemaName(tenant.getSchemaName())
+                .organizationId(organizationOutput.id())
+                .build();
         } finally {
             TenantContext.clear();
         }

@@ -7,7 +7,7 @@ import java.time.MonthDay;
 import java.util.UUID;
 
 @Builder
-public record OrganizationResponse(
+public record OrganizationOutput(
     UUID id,
     String name,
     LegalStatus legalStatus,

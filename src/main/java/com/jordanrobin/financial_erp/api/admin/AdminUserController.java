@@ -1,10 +1,11 @@
 package com.jordanrobin.financial_erp.api.admin;
 
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserOutput;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserResponse;
 import com.jordanrobin.financial_erp.shared.constants.ApiRoutes;
 import com.jordanrobin.financial_erp.api.admin.dtos.CreateSuperUserRequest;
 import com.jordanrobin.financial_erp.api.admin.mappers.SuperUserApiMapper;
 import com.jordanrobin.financial_erp.domain.auth.user.UserService;
-import com.jordanrobin.financial_erp.domain.auth.user.dtos.SuperUserResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,9 @@ public class AdminUserController {
     private final SuperUserApiMapper superUserApiMapper;
 
     @PostMapping
-    public ResponseEntity<SuperUserResult> createSuperUser(@Valid @RequestBody CreateSuperUserRequest request) {
-        SuperUserResult result = userService.createSuperUser(superUserApiMapper.requestToCommand(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<UserResponse> createSuperUser(@Valid @RequestBody CreateSuperUserRequest request) {
+        UserOutput userOutput = userService.createSuperUser(superUserApiMapper.requestToCommand(request));
+        // TODO renvoyer Location
+        return ResponseEntity.status(HttpStatus.CREATED).body(superUserApiMapper.outputToResponse(userOutput));
     }
 }

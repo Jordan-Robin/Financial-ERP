@@ -1,7 +1,7 @@
 package com.jordanrobin.financial_erp.api.organization;
 
 import com.jordanrobin.financial_erp.api.organization.dtos.CreateOrganizationRequest;
-import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
 import com.jordanrobin.financial_erp.api.organization.mappers.OrganizationApiMapper;
 import com.jordanrobin.financial_erp.domain.organization.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +29,8 @@ public class OrganizationController {
     @ApiResponse(responseCode = "400", description = "Données invalides")
     @ApiResponse(responseCode = "409", description = "Organisation déjà existante avec ce Siren")
     @PostMapping
-    public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody CreateOrganizationRequest request) {
-        OrganizationResponse response = organizationService.create(organizationApiMapper.dtoToCommand(request));
+    public ResponseEntity<OrganizationOutput> create(@Valid @RequestBody CreateOrganizationRequest request) {
+        OrganizationOutput response = organizationService.create(organizationApiMapper.dtoToCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -38,8 +38,8 @@ public class OrganizationController {
     @ApiResponse(responseCode = "200", description = "Organisation trouvée")
     @ApiResponse(responseCode = "404", description = "Organisation non trouvée")
     @GetMapping("/{id}")
-    public ResponseEntity<OrganizationResponse> getById(@PathVariable UUID id) {
-        OrganizationResponse response = organizationService.getById(id);
+    public ResponseEntity<OrganizationOutput> getById(@PathVariable UUID id) {
+        OrganizationOutput response = organizationService.getById(id);
         return ResponseEntity.ok(response);
     }
 

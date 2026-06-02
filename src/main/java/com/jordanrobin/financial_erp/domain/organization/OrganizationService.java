@@ -1,6 +1,6 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
-import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
 import com.jordanrobin.financial_erp.domain.organization.mappers.OrganizationDomainMapper;
 import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
@@ -20,17 +20,17 @@ public class OrganizationService {
     private final OrganizationDomainMapper organizationDomainMapper;
 
     @Transactional
-    public OrganizationResponse create(CreateOrganizationCommand command) {
+    public OrganizationOutput create(CreateOrganizationCommand command) {
         if (command.siren() != null && organizationRepository.existsBySiren(command.siren())) {
             throw new ResourceAlreadyExistsException(Organization.class.getSimpleName(), "siren", command.siren());
         }
         Organization organization = organizationDomainMapper.commandToEntity(command);
-        return organizationDomainMapper.entityToResponse(organizationRepository.save(organization));
+        return organizationDomainMapper.entityToOutput(organizationRepository.save(organization));
     }
 
-    public OrganizationResponse getById(UUID id) {
+    public OrganizationOutput getById(UUID id) {
         return organizationRepository.findById(id)
-            .map(organizationDomainMapper::entityToResponse)
+            .map(organizationDomainMapper::entityToOutput)
             .orElseThrow(() -> new ResourceNotFoundException(Organization.class.getSimpleName(), "id", id.toString()));
     }
 

@@ -1,7 +1,7 @@
 package com.jordanrobin.financial_erp.domain.organization;
 
+import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
 import com.jordanrobin.financial_erp.domain.organization.mappers.OrganizationDomainMapper;
-import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationResponse;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +51,7 @@ public class OrganizationServiceTest {
             when(organizationDomainMapper.entityToResponse(entity)).thenReturn(response);
 
             // Act
-            OrganizationResponse result = organizationService.create(request);
+            OrganizationOutput result = organizationService.create(request);
 
             // Assert
             assertThat(result).isNotNull();
@@ -111,7 +111,7 @@ public class OrganizationServiceTest {
             when(organizationDomainMapper.entityToResponse(entity)).thenReturn(response);
 
             // Act
-            OrganizationResponse result = organizationService.getById(id);
+            OrganizationOutput result = organizationService.getById(id);
 
             // Assert
             assertThat(result.id()).isEqualTo(id);

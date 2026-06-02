@@ -1,18 +1,23 @@
 package com.jordanrobin.financial_erp.infrastructure.persistence.tenant;
 
 public class TenantContext {
+    // TODO ajouter implements AutoCloseable ou
+//    public static AutoCloseable setContext(String schemaName) {
+//        setCurrentSchema(schemaName);
+//        return TenantContext::clear; // La méthode close() exécutera clear()
+//    }
 
-    private static final ThreadLocal<String> currentSchema = new ThreadLocal<>();
+    private static final ThreadLocal<String> CURRENT_SCHEMA = new ThreadLocal<>();
 
     public static void setCurrentSchema(String schema) {
-        currentSchema.set(schema);
+        CURRENT_SCHEMA.set(schema);
     }
 
     public static String getCurrentSchema() {
-        return currentSchema.get();
+        return CURRENT_SCHEMA.get();
     }
 
     public static void clear() {
-        currentSchema.remove();
+        CURRENT_SCHEMA.remove();
     }
 }

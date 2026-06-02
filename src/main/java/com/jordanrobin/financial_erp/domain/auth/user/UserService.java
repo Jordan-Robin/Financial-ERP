@@ -5,7 +5,7 @@ import com.jordanrobin.financial_erp.domain.auth.invitationtoken.dtos.CreateToke
 import com.jordanrobin.financial_erp.domain.auth.user.mappers.SuperUserDomainMapper;
 import com.jordanrobin.financial_erp.domain.auth.user.mappers.UserDomainMapper;
 import com.jordanrobin.financial_erp.domain.auth.user.dtos.CreateSuperUserCommand;
-import com.jordanrobin.financial_erp.domain.auth.user.dtos.SuperUserResult;
+import com.jordanrobin.financial_erp.domain.auth.user.dtos.UserOutput;
 import com.jordanrobin.financial_erp.infrastructure.messaging.EmailService;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class UserService {
 //    }
 
     @Transactional
-    public SuperUserResult createSuperUser(CreateSuperUserCommand command) {
+    public UserOutput createSuperUser(CreateSuperUserCommand command) {
         if (userRepository.existsByEmail(command.email())) {
             throw new ResourceAlreadyExistsException(User.class.getSimpleName(), "email", command.email());
         }
@@ -52,7 +52,7 @@ public class UserService {
 
         emailService.sendInvitation(userSaved.getEmail(), createTokenResult.rawToken());
 
-        return SuperUserResult.builder()
+        return UserOutput.builder()
             .id(userSaved.getId())
             .email(userSaved.getEmail())
             .status(userSaved.getStatus())
