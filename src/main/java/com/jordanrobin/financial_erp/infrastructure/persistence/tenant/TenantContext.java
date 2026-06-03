@@ -1,11 +1,10 @@
 package com.jordanrobin.financial_erp.infrastructure.persistence.tenant;
 
 public class TenantContext {
-    // TODO ajouter implements AutoCloseable ou
-//    public static AutoCloseable setContext(String schemaName) {
-//        setCurrentSchema(schemaName);
-//        return TenantContext::clear; // La méthode close() exécutera clear()
-//    }
+
+    private TenantContext() {
+        throw new UnsupportedOperationException("Cette classe utilitaire ne peut pas être instanciée");
+    }
 
     private static final ThreadLocal<String> CURRENT_SCHEMA = new ThreadLocal<>();
 

@@ -10,7 +10,7 @@ public class ResourceAlreadyExistsException extends RuntimeException {
     private final String identifierValue;
 
     public ResourceAlreadyExistsException(String resource, String identifierName, String identifierValue) {
-        super(resource + " - " + identifierName + " déjà existant pour la valeur " + identifierValue + ".");
+        super(resource + " - " + identifierName + " déjà existant pour la valeur '" + identifierValue + "'.");
         this.resource = resource;
         this.identifierName = identifierName;
         this.identifierValue = identifierValue;

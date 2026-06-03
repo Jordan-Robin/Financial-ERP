@@ -10,7 +10,7 @@ public class ResourceNotFoundException extends RuntimeException {
     private final String identifierValue;
 
     public ResourceNotFoundException(String resource,String identifierName, String identifierValue) {
-        super(resource + " - " + identifierName + " non trouvé pour la valeur " + identifierValue + ".");
+        super(resource + " - " + identifierName + " non trouvé pour la valeur '" + identifierValue + "'.");
         this.resource = resource;
         this.identifierName = identifierName;
         this.identifierValue = identifierValue;

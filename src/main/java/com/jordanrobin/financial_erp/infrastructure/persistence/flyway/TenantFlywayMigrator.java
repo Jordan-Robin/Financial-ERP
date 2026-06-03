@@ -1,6 +1,6 @@
 package com.jordanrobin.financial_erp.infrastructure.persistence.flyway;
 
-import com.jordanrobin.financial_erp.shared.exception.auth.InvalidSchemaNameException;
+import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +16,10 @@ public class TenantFlywayMigrator {
     private final JdbcTemplate jdbcTemplate;
 
     public void migrate(String schemaName) {
+        if (verifyIfSchemaAlreadyExists(schemaName)) {
+            throw new ResourceAlreadyExistsException("Base de donnée", "schema", schemaName);
+        }
+
         createSchema(schemaName);
 
         Flyway.configure()
@@ -29,6 +33,13 @@ public class TenantFlywayMigrator {
             .outOfOrder(false)
             .load()
             .migrate();
+    }
+
+    private boolean verifyIfSchemaAlreadyExists(String schemaName) {
+        String sql = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = ?)";
+        Boolean schemaExists = jdbcTemplate.queryForObject(sql, Boolean.class, schemaName);
+
+        return Boolean.TRUE.equals(schemaExists);
     }
 
     private void createSchema(String schemaName) {
