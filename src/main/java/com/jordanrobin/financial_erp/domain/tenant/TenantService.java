@@ -1,5 +1,8 @@
 package com.jordanrobin.financial_erp.domain.tenant;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import com.jordanrobin.financial_erp.domain.organization.OrganizationService;
 import com.jordanrobin.financial_erp.domain.organization.dtos.CreateOrganizationCommand;
 import com.jordanrobin.financial_erp.domain.organization.dtos.OrganizationOutput;
@@ -9,8 +12,6 @@ import com.jordanrobin.financial_erp.infrastructure.persistence.flyway.TenantFly
 import com.jordanrobin.financial_erp.infrastructure.persistence.tenant.TenantContext;
 import com.jordanrobin.financial_erp.shared.exception.auth.InvalidSchemaNameException;
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

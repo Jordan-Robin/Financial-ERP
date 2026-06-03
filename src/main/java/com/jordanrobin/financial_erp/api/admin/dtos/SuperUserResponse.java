@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record UserResponse(
+public record SuperUserResponse(
     UUID id,
     String email,
     UserStatus status

@@ -1,4 +1,4 @@
-package com.jordanrobin.financial_erp.shared.utils;
+package com.jordanrobin.financial_erp.api.shared.utils;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

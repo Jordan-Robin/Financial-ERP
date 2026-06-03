@@ -1,6 +1,7 @@
 package com.jordanrobin.financial_erp.infrastructure.persistence.flyway;
 
 import com.jordanrobin.financial_erp.shared.exception.resource.ResourceAlreadyExistsException;
+
 import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.JdbcTemplate;
